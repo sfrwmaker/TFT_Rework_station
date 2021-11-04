@@ -7,6 +7,7 @@ No sources available at the moment.
 The description of the project you can find on hackster https://www.hackster.io/sfrwmaker/stm32-soldering-and-rework-station-with-tft-display-b23f73
 
 Revision history:
+
 Nov 02 2021, v.1.02
 * Fixed error unformatted flash detection
 * Fixed black screen if the flash is not formatted
