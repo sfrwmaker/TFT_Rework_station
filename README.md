@@ -8,7 +8,7 @@ The description of the project you can find on hackster https://www.hackster.io/
 
 Revision history:
 
-Nov 02 2021, v.1.02
+Nov 04 2021, v.1.02
 * Fixed error unformatted flash detection
 * Fixed black screen if the flash is not formatted
 * Introduce the debug mode
