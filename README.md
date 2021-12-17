@@ -12,3 +12,7 @@ Nov 04 2021, v.1.02
 * Fixed error unformatted flash detection
 * Fixed black screen if the flash is not formatted
 * Introduce the debug mode
+
+Dec 17 2021, v.1.03
+* Fixed error the hot Air Gun calibration data rewrites current tip calibration
+* Iron anf Hot Air Gun messages changed to icons to simplify project localization
