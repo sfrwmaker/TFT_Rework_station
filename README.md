@@ -14,5 +14,11 @@ Nov 04 2021, v.1.02
 * Introduce the debug mode
 
 Dec 17 2021, v.1.03
-* Fixed error the hot Air Gun calibration data rewrites current tip calibration
+* Fixed issue the hot Air Gun calibration data rewrites current tip calibration
 * Iron anf Hot Air Gun messages changed to icons to simplify project localization
+
+Dec 21 2021, v.1.04
+* Fixed Hot Air Gun setup temperature or fan speed issue in the main working mode
+* Added Native Language Support using UTF-8 encoding. Please, consult article on hackster.io how lo upload NLS files to the SPI FLASH.
+* Added russian language messages (Cyryllic font + message file)
+* Added Portugeese language messages (Western Europe font + message file). Thank to my friend Armindo for translation.
