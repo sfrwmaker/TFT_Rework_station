@@ -1,0 +1,6 @@
+{
+	"languages": [
+		{ "name": "russian",	"messages": "ru_lang.json",		"font": "ubuntu_cyr.font"},
+		{ "name": "portuguese", "messages": "port_lang.json",	"font": "ubuntu_we.font"},
+	]
+}

@@ -1,0 +1,80 @@
+{
+	"standalone": {
+		"Fan:":							"VENT:",
+		"Pwr:":							"POT:",
+		"TILT":							"INCL.",
+		"deg.":							"grau",
+		"min":							"min.",
+		"sec":							"seg.",
+		"cw":							"horario",
+		"ccw":							"ant.horario",,
+		"ERROR":						"ERRO",
+		"Tune PID":						"ajuste PID",
+		"Select tip":					"Selecionar ponta",
+		"EEPROM read error":			"Erro Ler Memoria",
+		"EEPROM write error":			"Erro Gravar Memoria",
+		"No directory":					"Diretorio Nao Existe",
+		"Format EEPROM?":				"Formatar EEprom?",
+		"Failed to format EEPROM":		"Falha Formatar EEprom",
+		"saving configuration":			"Salvando Configuraçao",
+		"Hot Gun":						"Ar-Quente",
+		"Save?":						"Salvar?",
+		"Yes":							"Sim",
+		"No":							"Não",
+	},	
+	"Menu": {
+		"Main Menu": {
+			"Main Menu":				"Menu Principal",
+			"parameters":				"Parametros",
+			"boost setup":				"Ajuste de Reforço",
+			"change tip":				"Mudar Ponta",
+			"calibrate tip":			"Calibrar Ponta",
+			"activate tips":			"Ativar Ponta",
+			"tune iron":				"Ajustar Ferro",
+			"gun setup":				"Calibrar Ar-Quente",
+			"reset config":				"Anular Config.",
+			"tune iron PID":			"Ajustar PID Ferro",
+			"about":					"Sobre",
+			"quit":						"Sair"
+		},
+		"Parameters": {
+			"Parameters":				"Parametros",
+			"units":					"Unidades",
+			"buzzer":					"Buzzer",
+			"iron encoder":				"Encoder Ferro",
+			"gun encoder":				"Encoder Ar-Quente",
+			"switch type":				"Tipo de Chave",
+			"change tip":				"Mudar Ponta",
+			"temp. step":				"Incremento Temp",
+			"auto start":				"Auto Iniciar",
+			"auto off":					"Auto Desligar",
+			"standby temp":				"Temp. de Espera",
+			"standby time":				"Tempo de Espera",
+			"brightness":				"Brilho",
+			"language":					"Idioma",
+			"save":						"Salvar",
+			"cancel":					"Cancelar"
+		},
+		"Boost setup": {
+			"Boost setup":				"Ajuste de Reforço",
+			"temperature":				"Temperatura",
+			"duration":					"Duraçao",
+			"back to menu":				"Voltar ao Menu"
+		},
+		"Calibrate": {
+			"Calibrate":				"Calibrar",
+			"automatic":				"Automatico",
+			"manual":					"Manual",
+			"clear":					"Limpar",
+			"quit":						"Sair"
+		},
+		"Hot Air Gun": {
+			"Hot Air Gun":				"Ar-Quente",
+			"calibrate":				"Caibrar",
+			"tune gun":					"Ajustar Ar-Quente",
+			"tune gun PID":				"Ajustar PID Ar-Quente",
+			"clear":					"Limpar",
+			"exit":						"Sair"
+		}
+	}
+}

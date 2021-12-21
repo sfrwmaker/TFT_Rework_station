@@ -1,0 +1,85 @@
+{
+	"standalone": {
+		"OFF":							"откл",
+		"ON":							"вкл",
+		"Fan:":							"Фен:",
+		"Pwr:":							"мощн:",
+		"Ref. #":						"Тчк №",
+		"REED":							"геркон",
+		"TILT":							"вибро",
+		"deg.":							"град.",
+		"min":							"мин",
+		"sec":							"сек",
+		"cw":							"вправо",
+		"ccw":							"влево",
+		"Set:":							"Уст:",
+		"ERROR":						"ОШИБКА",
+		"Tune PID":						"настройка ПИД",
+		"Select tip":					Выбрать жало",
+		"EEPROM read error":			"Ошибка чтения памяти",
+		"EEPROM write error":			"Ошибка записи в память",
+		"No directory":					"Нет каталога",
+		"Format EEPROM?":				"Форматировать?",
+		"Failed to format EEPROM":		"Ошибка форматирования",
+		"saving configuration":			"сохранение",
+		"Hot Gun":						"Термофен",
+		"Save?":						"Сохранить?",
+		"Yes":							"Да",
+		"No":							"Нет"
+	},	
+	"Menu": {
+		"Main Menu": {
+			"Main Menu":				"Основное меню",
+			"parameters":				"параметры",
+			"boost setup":				"буст режим",
+			"change tip":				"сменить жало",
+			"calibrate tip":			"калибровка жала",
+			"activate tips":			"активация жал",
+			"tune iron":				"настр. паяльника",
+			"gun setup":				"настройка фена",
+			"reset config":				"сброс настроек",
+			"tune iron PID":			"ПИД паяльника",
+			"about":					"версия ПО",
+			"quit":						"выход"
+		},
+		"Parameters": {
+			"Parameters":				"Настройки",
+			"units":					"градусы",
+			"buzzer":					"зуммер",
+			"iron encoder":				"энкодер паяльника",
+			"gun encoder":				"энкодер фена",
+			"switch type":				"тип датчика",
+			"change tip":				"смена жала",
+			"temp. step":				"шаг температуры",
+			"auto start":				"автостарт",
+			"auto off":					"выключение",
+			"standby temp":				"темп. ожидания",
+			"standby time":				"время ожидания",
+			"brightness":				"яркость",
+			"language":					"язык",
+			"save":						"сохранить",
+			"cancel":					"отмена"
+		},
+		"Boost setup": {
+			"Boost setup":				"Буст режим",
+			"temperature":				"температура",
+			"duration":					"длительность",
+			"back to menu":				"вернуться"
+		},
+		"Calibrate": {
+			"Calibrate":				"Калибровка",
+			"automatic":				"автоматически",
+			"manual":					"вручную",
+			"clear":					"сброс",
+			"quit":						"выход"
+		},
+		"Hot Air Gun": {
+			"Hot Air Gun":				"Термофен",
+			"calibrate":				"калибровка",
+			"tune gun":					"настройка фена",
+			"tune gun PID":				"ПИД фена",
+			"clear":					"сброс",
+			"exit":						"выход"
+		}
+	}
+}
