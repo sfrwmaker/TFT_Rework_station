@@ -22,3 +22,6 @@ Dec 21 2021, v.1.04
 * Added Native Language Support using UTF-8 encoding. Please, consult article on hackster.io how lo upload NLS files to the SPI FLASH.
 * Added russian language messages (Cyryllic font + message file)
 * Added Portugeese language messages (Western Europe font + message file). Thank to my friend Armindo for translation.
+
+Dec 22 2021, v.1.05
+* Extend diagnistic messages when uploading NLS data from SD-CARD  
