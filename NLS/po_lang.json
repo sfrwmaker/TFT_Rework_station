@@ -1,0 +1,86 @@
+{
+	"standalone": {
+		"OFF":							"Wył",
+		"ON":							"Wł",
+		"Fan:":							"Went.:",
+		"Pwr:":							"Pwr:",
+		"Ref. #":						"Ref. #",
+		"REED":							"REED",
+		"TILT":							"Wibr.",
+		"deg.":							"deg.",
+		"min":							"min",
+		"sec":							"sec",
+		"cw":							"w prawo",
+		"ccw":							"w lewo",
+		"Set:":							"Set:",
+		"ERROR":						"ERROR",
+		"Tune PID":						"Ustawienia PID",
+		"Select tip":					"Wybór grota",
+		"EEPROM read error":			"Błąd odczytu pamięci",
+		"EEPROM write error":			"Błąd odczytu pamięci",
+		"No directory":					"Brak katalogu",
+		"Format EEPROM?":				"Formatować?",
+		"Failed to format EEPROM": 		"Błąd formatowania",
+		"saving configuration":			"Zapisywanie konfiguracji",
+		"Hot Gun":						"Hot Gun",
+		"Save?":						"Zapisać?",
+		"Yes":							"Tak",
+		"No":							"Nie"
+	},
+	"Menu": {
+		"Main Menu": {
+			"Main Menu":				"Menu główne",
+			"parameters":				"Parametry",
+			"boost setup":				"Ust.boost",
+			"change tip":				"Zmiana grota",
+			"calibrate tip":			"Kalibracja grota",
+			"activate tips":			"Aktywacja grota",
+			"tune iron":				"Ustawienia.lutow.",
+			"gun setup":				"Ustawienia hot-air",
+			"reset config":				"Reset ustawień",
+			"tune iron PID":			"PID lutownicy",
+			"about":					"Wersja oprogram.",
+			"quit":						"Wyjście"
+		},
+		"Parameters": {
+			"Parameters":				"Ustawienia",
+			"units":					"Stopnie",
+			"buzzer":					"Buzzer",
+			"iron encoder":				"Enkoder lutow.",
+			"gun encoder":				"Enkoder hot-air",
+			"switch type":				"Typ czujnika",
+			"change tip":				"Zmiana tip",
+			"temp. step":				"Skok temperatury",
+			"auto start":				"auto start",
+			"auto off":					"Auto wył.",
+			"standby temp":				"Standby temp.",
+			"standby time":				"Czas oczekiwania",
+			"brightness":				"Jasność",
+			"language":					"Język",
+			"save":						"Zapisać",
+			"cancel":					"Anuluj"
+		},
+		"Boost setup": {
+			"Boost setup":				"Ustawienia Boost",
+			"temperature":				"Temperatura",
+			"duration":					"Czas trwania",
+			"back to menu":				"Powrót do menu"
+		},
+		"Calibrate": {
+			"Calibrate":				"Kalibracja",
+			"automatic":				"Automatyczna",
+			"manual":					"Ręczna",
+			"clear":					"Wyczyścić",
+			"quit":						"Wyjście"
+		},
+		"Hot Air Gun": {
+			"Hot Air Gun":				"Hot Air",
+			"calibrate":				"Kalibracja",
+			"tune gun":					"Ustawienia Hot Air",
+			"tune gun PID":				"Ustawienia PID",
+			"clear":					"Wyczyścić",
+			"exit":						"Wyjście"
+		}
+	}
+}
+
