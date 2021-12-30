@@ -27,5 +27,5 @@ Dec 22 2021, v.1.05
 * Extend diagnistic messages when uploading NLS data from SD-CARD  
 
 Dec 30 2021, v.1.06
-* Mirror bugs fixed
+* Minor bugs fixed
 * Added polish language messages (Western Europe font - impact + message file). In my opinion, the impact font is not very clear, it is better to use unifont_we.font.
