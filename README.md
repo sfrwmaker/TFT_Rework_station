@@ -29,3 +29,6 @@ Dec 22 2021, v.1.05
 Dec 30 2021, v.1.06
 * Minor bugs fixed
 * Added polish language messages (Western Europe font - impact + message file). In my opinion, the impact font is not very clear, it is better to use unifont_we.font.
+
+Dec 31, 2021, v.1.07
+* Fixed parameter menu incorrect value show issue
