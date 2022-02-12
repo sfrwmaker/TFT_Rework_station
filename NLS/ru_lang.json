@@ -16,16 +16,23 @@
 		"ERROR":						"ОШИБКА",
 		"Tune PID":						"настройка ПИД",
 		"Select tip":					Выбрать жало",
-		"EEPROM read error":			"Ошибка чтения памяти",
-		"EEPROM write error":			"Ошибка записи в память",
+		"FLASH read error":				"Ошибка чтения памяти",
+		"FLASH write erro":				"Ошибка записи в память",
 		"No directory":					"Нет каталога",
-		"Format EEPROM?":				"Форматировать?",
-		"Failed to format EEPROM":		"Ошибка форматирования",
+		"format FLASH?":				"Форматировать?",
+		"Failed to format FLASH":		"Ошибка форматирования",
 		"saving configuration":			"сохранение",
 		"Hot Gun":						"Термофен",
 		"Save?":						"Сохранить?",
 		"Yes":							"Да",
-		"No":							"Нет"
+		"No":							"Нет",
+		"Delete file":					"Удалить файл",
+		"FLASH debug":					"Отладка FLASH",
+		"Failed mount SD":				"Ошибка карты",
+		"NO config file":				"Нет файла конф.",
+		"No lang. specified":			"Язык не задан",
+		"No memory":					"Недостаточно памяти",
+		"Inconsistent lang":			"Неполный язык"
 	},	
 	"Menu": {
 		"Main Menu": {
@@ -56,6 +63,7 @@
 			"standby temp":				"темп. ожидания",
 			"standby time":				"время ожидания",
 			"brightness":				"яркость",
+			"rotation":					"поворот",
 			"language":					"язык",
 			"save":						"сохранить",
 			"cancel":					"отмена"
