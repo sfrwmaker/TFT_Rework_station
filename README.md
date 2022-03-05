@@ -37,3 +37,6 @@ Feb 12, 2022, v.1.08
 * Fixed errors in NLS files, added new sentenses to russian ang portugeese languages
 * Added support for display rotaion (0, 90, 180, 270 degrees). Landscape display rotation is the default.
 * Display rotation menu item added to the parameters menu
+
+Mar 4, 2022, v.1.09
+* Changed rotary endoder procedure. Increased encoder stability. 
