@@ -39,4 +39,8 @@ Feb 12, 2022, v.1.08
 * Display rotation menu item added to the parameters menu
 
 Mar 4, 2022, v.1.09
-* Changed rotary endoder procedure. Increased encoder stability. 
+* Changed rotary endoder procedure. Increased encoder stability.
+
+Oct 14, 2022, v.1.10
+* Rebuilt the project using STM CubeIDE and new HAL firmware.
+
