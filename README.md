@@ -43,4 +43,4 @@ Mar 4, 2022, v.1.09
 
 Oct 14, 2022, v.1.10
 * Rebuilt the project using STM CubeIDE and new HAL firmware.
-
+* Add second binary version with DMA support of the TFT SPI display.
