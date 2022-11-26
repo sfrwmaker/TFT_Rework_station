@@ -123,7 +123,7 @@ void Error_Handler(void);
 #define BUZZER_Pin GPIO_PIN_9
 #define BUZZER_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-#define FW_VERSION	("1.11")
+#define FW_VERSION	("1.12")
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

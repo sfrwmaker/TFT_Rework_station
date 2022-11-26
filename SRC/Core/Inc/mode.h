@@ -1,6 +1,9 @@
 /*
  * mode.h
  *
+ * 11/26/2022
+ *   changed in_place_start and in_place_end values in the MSETUP class
+ *
  */
 
 #include <vector>
@@ -148,8 +151,8 @@ private:
 	uint8_t		set_param		= 0;					// The index of the modifying parameter
 	uint8_t		mode_menu_item 	= 0;					// Save active menu element index to return back later
 	// When new menu item added, in_place_start, in_place_end, tip_calib_menu constants should be adjusted
-	const uint8_t	in_place_start	= 8;				// See the menu names. Index of the first parameter that can be changed inside menu (see nls.h)
-	const uint8_t	in_place_end	= 13;				// See the menu names. Index of the last parameter that can be changed inside menu
+	const uint8_t	in_place_start	= 7;				// See the menu names. Index of the first parameter that can be changed inside menu (see nls.h)
+	const uint8_t	in_place_end	= 12;				// See the menu names. Index of the last parameter that can be changed inside menu
 	const uint16_t	min_standby_C	= 120;				// Minimum standby temperature, Celsius
 	enum { MM_UNITS = 0, MM_BUZZER, MM_I_ENC, MM_G_ENC, MM_SWITCH_TYPE, MM_TEMP_STEP, MM_AUTO_START,
 			MM_AUTO_OFF, MM_STANDBY_TEMP, MM_STANDBY_TIME, MM_BRIGHT, MM_ROTATION, MM_LANGUAGE, MM_SAVE, MM_CANCEL
