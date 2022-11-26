@@ -49,3 +49,8 @@ Nov 14, 2022, v.1.11
 * Rebuilt the project with an updateg graphic library version.
 * Revisited internal controller logic.
 * Minor bugs fixed.
+
+Nov 26, 2022, v 1.12
+* Fixed issues in the parameters menu
+* Updated the NLS message files (removed one parameter item, old files should work properly)
+
