@@ -1,6 +1,8 @@
 /*
  * mode.cpp
  *
+ * 11/26/2022
+ *     Changed the uint8_t p = 3; in case MM_STANDBY_TIME of MSETUP::loop() method
  */
 
 #include <stdio.h>
@@ -1065,9 +1067,9 @@ MODE* MSETUP::loop(void) {
 				if (to < 60) {
 					sprintf(item_value, "%2d ", to);
 					strncpy(&item_value[3], pD->msg(MSG_SECONDS), value_length - 3);
-				} else if (to %60) {
+				} else if (to % 60) {							// Minutes and seconds
 					sprintf(item_value, "%2d ", to/60);
-					uint8_t p = 2;
+					uint8_t p = 3;
 					strncpy(&item_value[p], pD->msg(MSG_MINUTES), value_length-p);
 					p += strlen(pD->msg(MSG_MINUTES));
 					if (p < value_length) {
