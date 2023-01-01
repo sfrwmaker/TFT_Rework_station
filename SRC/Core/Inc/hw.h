@@ -3,6 +3,9 @@
  *
  *  Created on: 12 july 2021
  *      Author: Alex
+ *
+ *  2023 JAN 01
+ *      Added arguments into HW::init() method to initialize the hardware at startup
  */
 
 #ifndef HW_H_
@@ -27,7 +30,7 @@ class HW {
 		HW(void) : cfg(),
 			i_enc(I_ENC_R_GPIO_Port, I_ENC_R_Pin, I_ENC_L_GPIO_Port, I_ENC_L_Pin),
 			g_enc(G_ENC_R_GPIO_Port, G_ENC_R_Pin, G_ENC_L_GPIO_Port, G_ENC_L_Pin)		{ }
-		CFG_STATUS	init(void);
+		CFG_STATUS	init(uint16_t t12_temp, uint16_t gun_temp, uint16_t ambient);
 		uint16_t			ambientInternal(void)			{ return t_amb.read();							}
 		bool				noAmbientSensor(void)			{ return t_amb.read() >= max_ambient_value;		}
 		void				updateAmbient(uint32_t value)	{ t_amb.update(value);							}

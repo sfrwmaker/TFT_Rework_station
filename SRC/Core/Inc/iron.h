@@ -5,6 +5,8 @@
  *     Added POWER_HEATING mode to prevent soldering iron overheating in the first phase
  * 2022 Nov 9
  * 	   Added b_reset bool variable flag to initialize the IRON temperature EMP_AVERAGE values
+ * 2023 JAN 01
+ *     Added argument into IRON::init() method
  *
  */
 
@@ -18,7 +20,7 @@ class IRON : public UNIT {
 	public:
 	typedef enum { POWER_OFF, POWER_HEATING, POWER_ON, POWER_FIXED, POWER_COOLING, POWER_PID_TUNE, POWER_BOOST } PowerMode;
 		IRON(void) 											{ }
-		void		init(void);
+		void				init(uint16_t temp);
 		virtual void		switchPower(bool On);
 		virtual void		autoTunePID(uint16_t base_pwr, uint16_t delta_power, uint16_t base_temp, uint16_t temp);
 		bool				isOn(void)						{ return (mode == POWER_ON); }
