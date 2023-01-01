@@ -6,17 +6,20 @@
  *
  *  2022 Nov 6
  *  	added t_amb.reset() to the HW::init() method to initialize the default ambient temperature
+ *  2023 JAN 01
+ *      Added hardware initialization code (temperaatures) into HW::init() method
  */
 
 #include <math.h>
 #include "hw.h"
 
-CFG_STATUS HW::init(void) {
+CFG_STATUS HW::init(uint16_t t12_temp, uint16_t gun_temp, uint16_t ambient) {
 	dspl.init();
 	t_amb.length(ambient_emp_coeff);
-	t_amb.reset(2000);										// Initialize the ambient temperature near 25 degrees (ADC value = 2000)
-	iron.init();
+	t_amb.reset(ambient);									// Initialize the ambient temperature
+	iron.init(t12_temp);
 	hotgun.init();
+	hotgun.updateTemp(gun_temp);
 	i_enc.addButton(I_ENC_B_GPIO_Port, I_ENC_B_Pin);
 	g_enc.addButton(G_ENC_B_GPIO_Port, G_ENC_B_Pin);
 	CFG_STATUS cfg_init = 	cfg.init();

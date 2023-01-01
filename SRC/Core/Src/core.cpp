@@ -3,6 +3,15 @@
  *
  *  Created on: 30 aug 2019
  *      Author: Alex
+ *
+ *  2022 DEC 26
+ *     Added variables to check the GUN timer (TIM1) period: gtim_period, gtim_last_ms
+ *     Added gtimPeriod()
+ *     Modified the void HAL_TIM_OC_DelayElapsedCallback()
+ *
+ *  2023 JAN 01
+ *     Added hardware initialization code into setup() procedure
+ *
  */
 
 #include "core.h"
@@ -23,6 +32,8 @@ volatile static t_ADC_mode	adc_mode = ADC_IDLE;
 volatile static uint16_t	buff[ADC_BUFF_SZ];
 volatile static	uint32_t	tim1_cntr		= 0;			// Previous value of TIM1 counter. Using to check the TIM1 value changing
 volatile static	bool		ac_sine			= false;		// Flag indicating that TIM1 is driven by AC power interrupts on AC_ZERO pin
+static 	EMP_AVERAGE			gtim_period;					// gun timer period (ms)
+volatile static uint32_t	gtim_last_ms	= 0;			// Time when the gun timer became zero
 const static uint16_t  		max_iron_pwm	= 1960;			// Max value should be less than TIM2.CHANNEL3 value by 20
 const static uint16_t  		max_gun_pwm		= 99;			// TIM1 period. Full power can be applied to the HOT GUN
 const static uint32_t		check_sw_period = 100;			// IRON switches check period, ms
@@ -51,7 +62,8 @@ static	MSETUP			param_menu(&core);
 static	MMENU			main_menu(&core, &boost_setup, &iselect, &param_menu, &calib_menu, &activate, &tune, &pid_tune, &gun_menu, &about);
 static	MODE*           pMode = &work;
 
-bool isACsine(void) 	{ return ac_sine; }
+bool     isACsine(void) 	{ return ac_sine; }
+uint16_t gtimPeriod(void)	{ return gtim_period.read(); }
 
 // Synchronize TIM2 timer to AC power
 uint16_t syncAC(void) {
@@ -100,7 +112,21 @@ bool confirm(void) {
 }
 
 extern "C" void setup(void) {
-	CFG_STATUS cfg_init = core.init();						// Initialize the hardware structure before start timers
+	// Read temperature values
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, 100);
+	HAL_ADC_GetValue(&hadc1);								// The iron current, ignore
+	HAL_ADC_PollForConversion(&hadc1, 100);
+	HAL_ADC_GetValue(&hadc1);								// The fan current, ignore
+	HAL_ADC_PollForConversion(&hadc1, 100);
+	uint16_t t12_temp = HAL_ADC_GetValue(&hadc1);			// The iron temperature
+	HAL_ADC_PollForConversion(&hadc1, 100);
+	uint16_t gun_temp = HAL_ADC_GetValue(&hadc1);			// The Gun temperature
+	HAL_ADC_PollForConversion(&hadc1, 100);
+	uint16_t ambient = HAL_ADC_GetValue(&hadc1);			// The iron temperature
+	HAL_ADC_Stop(&hadc1);
+
+	CFG_STATUS cfg_init = core.init(t12_temp, gun_temp, ambient); // Initialize the hardware structure before start timers
 	core.iron.setCheckPeriod(3);							// Start checking the T12 IRON connectivity
 	HAL_TIM_PWM_Start(&htim1,	TIM_CHANNEL_4);				// PWM signal of Hot Air Gun
 	HAL_TIM_OC_Start_IT(&htim1, TIM_CHANNEL_3);				// Calculate power of Hot Air Gun interrupt
@@ -109,6 +135,8 @@ extern "C" void setup(void) {
 	HAL_TIM_OC_Start_IT(&htim2, TIM_CHANNEL_3);				// Check the current through the IRON and FAN, also check ambient temperature
 	HAL_TIM_OC_Start_IT(&htim2, TIM_CHANNEL_4);				// Calculate power of the IRON
 	HAL_TIM_PWM_Start(&htim4,   TIM_CHANNEL_4);				// PWM signal for the buzzer
+	gtim_period.length(10);
+	gtim_period.reset(1000);								// Default TIM1 period, ms
 
 	// Setup main mode parameters: return mode, short press mode, long press mode
 	work.setup(&main_menu, &iselect, &main_menu);
@@ -151,7 +179,7 @@ extern "C" void setup(void) {
 	}
 
 	syncAC();												// Synchronize TIM2 timer to AC power
-	HAL_Delay(1500);										// Wait till hardware status updated, for instance, the ambient temperature
+	HAL_Delay(200);											// Wait till hardware status updated
 	uint8_t br = core.cfg.getDsplBrightness();
 	core.dspl.BRGT::set(br);
 	//core.dspl.BRGT::on()								 	// Tuurn-on the display backlight immediately. Also, comment-out the BRGT::off(); line in void DSPL::clear()
@@ -223,6 +251,11 @@ extern "C" void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM1 && htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3) {
 		uint16_t gun_power	= core.hotgun.power();
 		TIM1->CCR4	= constrain(gun_power, 0, max_gun_pwm);	// Apply Hot Air Gun power
+		uint32_t n = HAL_GetTick();
+		if (ac_sine && gtim_last_ms > 0) {
+			gtim_period.update(n - gtim_last_ms);
+		}
+		gtim_last_ms = n;
 	} else if (htim->Instance == TIM2) {
 		if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3) {
 			if (TIM2->CCR1 || TIM2->CCR2)					// If IRON of Hot Air Gun has been powered

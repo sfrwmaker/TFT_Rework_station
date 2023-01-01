@@ -7,13 +7,15 @@
  *    Changed IRON::init(): default mode = POWER_COOLING, t_reset flag set to initialize the temperature value
  *    Changed IRON::power(): If t_reset flag is set, initialize the temperature EMP_AVERAGE value with the current temperature.
  *    						To make sure the IRON tip temperature is correct after controller startup or tip change
+ * 2023 JAN 01
+ *     Added temperature initialization code into IRON::init() method
  */
 
 #include <math.h>
 #include "iron.h"
 #include "tools.h"
 
-void IRON::init(void) {
+void IRON::init(uint16_t temp) {
 	mode		= POWER_COOLING;
 	fix_power	= 0;
 	chill		= false;
@@ -21,8 +23,10 @@ void IRON::init(void) {
 	t_reset		= true;										// This flag indicating the temperature value was reset
 	UNIT::init(iron_sw_len, iron_off_value,	iron_on_value, sw_tilt_len,	sw_off_value, sw_on_value);
 	t_iron_short.length(iron_emp_coeff);
+	t_iron_short.reset(temp);
 	h_power.length(ec);
 	h_temp.length(ec);
+	h_temp.reset(temp);
 	d_power.length(ec);
 	d_temp.length(ec);
 	PID::init(20, 11);										// Initialize PID for IRON. 50 Hz
