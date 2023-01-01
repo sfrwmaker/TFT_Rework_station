@@ -54,3 +54,6 @@ Nov 26, 2022, v 1.12
 * Fixed issues in the parameters menu
 * Updated the NLS message files (removed one parameter item, old files should work properly)
 
+Jan 01, 2023, 1 1.13
+* Changed TIM1 value in the debug screen. Now this velus shows the TIM1 period
+* Speed-up the power-up procedure. Not the temperature values are read from the hardware during startup
