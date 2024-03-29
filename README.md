@@ -57,3 +57,7 @@ Nov 26, 2022, v 1.12
 Jan 01, 2023, 1 1.13
 * Changed TIM1 value in the debug screen. Now this velus shows the TIM1 period
 * Speed-up the power-up procedure. Not the temperature values are read from the hardware during startup
+
+Mar 29, 2024, v 1.14
+* Updated the W25Qxx library
+* Fixed some issues regarded read and write operations on FLASH
