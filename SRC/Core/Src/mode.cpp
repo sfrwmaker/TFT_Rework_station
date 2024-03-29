@@ -1,8 +1,14 @@
 /*
  * mode.cpp
  *
- * 11/26/2022
+ * 2022 NOV 26
  *     Changed the uint8_t p = 3; in case MM_STANDBY_TIME of MSETUP::loop() method
+ *
+ * 2022 DEC 26
+ *     Changed MDEBUG::loop() to debug the GUN timer period
+ *
+ * 2024 MAR 28
+ *	   Changed the MFAIL::loop() to manage long press of gun encoder button
  */
 
 #include <stdio.h>
@@ -715,7 +721,7 @@ MODE* MTACT::loop(void) {
 	if (button == 1) {										// The button pressed
 		pD->BRGT::dim(50);									// Turn-off the brightness, processing
 		if (!pCFG->toggleTipActivation(tip_index)) {
-			pD->errorMessage(MSG_EEPROM_WRITE, 50);
+			pFail->setMessage(MSG_EEPROM_WRITE);
 			return 0;
 		}
 		pD->BRGT::on();										// Restore the display brightness
@@ -2295,7 +2301,12 @@ void MFAIL::init(void) {
 }
 
 MODE* MFAIL::loop(void) {
-	if (pCore->g_enc.buttonStatus() || pCore->g_enc.buttonStatus()) {
+	uint8_t ge = pCore->g_enc.buttonStatus();
+	if (ge == 2) {
+		message = MSG_LAST;										// Clear message
+		return mode_lpress;
+	}
+	if (ge || pCore->i_enc.buttonStatus()) {
 		message = MSG_LAST;										// Clear message
 		return mode_return;
 	}
@@ -2348,7 +2359,7 @@ void MDEBUG::init(void) {
 	pCore->dspl.clear();
 	pCore->dspl.drawTitleString("Debug info");
 	gun_is_on = false;
-	update_screen = 0;
+	update_screen	= 0;
 }
 
 MODE* MDEBUG::loop(void) {
@@ -2403,11 +2414,11 @@ MODE* MDEBUG::loop(void) {
 	data[4]	= pIron->reedInternal();
 	data[5]	= old_fp;
 	data[6] = pHG->averageTemp();
-	data[7]	= TIM1->CNT;										// TIM1 period is 99
-	if (isACsine()) data[7] += 100;								// Show flag indicating that AC events are detected
-	data[8]		= pCore->ambientInternal();
+	data[7]	= gtimPeriod();										// GUN_TIM period
+	data[8]	= pCore->ambientInternal();
 
-	pD->debugShow(data, (old_ip > 0), pHG->isReedSwitch(true), pIron->isConnected(), pHG->isConnected());
+	bool gtim_ok = isACsine() && (abs(data[7] - 1000) < 50);
+	pD->debugShow(data, (old_ip > 0), pHG->isReedSwitch(true), pIron->isConnected(), pHG->isConnected(), gtim_ok);
 	return this;
 }
 

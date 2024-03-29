@@ -3,6 +3,9 @@
  *
  *  Created on: 15 aug. 2019.
  *      Author: Alex
+ *
+ *  2024 MAR 28
+ *      Changed CFG::toggleTipActivation(). The variable tip_index now is signed, as soon as the saveTipData() returns -1 in case of error
  */
 
 #include <stdlib.h>
@@ -278,7 +281,7 @@ bool CFG::toggleTipActivation(uint8_t index) {
 	if (!tip_table)	return false;
 	bool ret = false;
 	TIP tip;
-	uint16_t tip_index = tip_table[index].tip_index;
+	int16_t tip_index = tip_table[index].tip_index;
 	if (tip_index == NO_TIP_CHUNK) {						// This tip data is not in the FLASH, it was not active!
 		const char *name = TIPS::name(index);
 		if (name) {
@@ -295,7 +298,7 @@ bool CFG::toggleTipActivation(uint8_t index) {
 	if (!ret) return false;
 
 	tip_index = saveTipData(&tip, true);
-	if (tip_index >= 0) {
+	if (tip_index >= 0 && tip_index < TIPS::loaded()) {
 		tip_table[index].tip_index	= tip_index;
 		tip_table[index].tip_mask	= tip.mask;
 		return true;

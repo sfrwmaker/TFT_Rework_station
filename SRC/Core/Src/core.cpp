@@ -12,6 +12,9 @@
  *  2023 JAN 01
  *     Added hardware initialization code into setup() procedure
  *
+ *  2024 MAR 28
+ *     Changed void setup(). When the FLASH failed to read, the fail mode would return to flash_debug mode only
+ *     Added active.setFail() call
  */
 
 #include "core.h"
@@ -142,6 +145,7 @@ extern "C" void setup(void) {
 	work.setup(&main_menu, &iselect, &main_menu);
 	iselect.setup(&work, &activate, &main_menu);
 	activate.setup(&work, &work, &main_menu);
+	activate.setFail(&fail);
 	calib_auto.setup(&work, &work, &work);
 	calib_manual.setup(&calib_menu, &work, &work);
 	calib_menu.setup(&work, &work, &work);
@@ -164,6 +168,7 @@ extern "C" void setup(void) {
 			break;
 		case CFG_READ_ERROR:								// Failed to read EEPROM
 			fail.setMessage(MSG_EEPROM_READ);
+			fail.setup(&fail, &fail, &flash_debug);			// Do not enter the main working mode
 			pMode	= &fail;
 			break;
 		case CFG_NO_FILESYSTEM:

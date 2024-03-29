@@ -1,6 +1,10 @@
 /*
  * flash.cpp
  *
+ *
+ * 2024 MAR 28
+ *     Changed W25Q::init(). In case if no cfg file read, do not unmount the FLASH
+ *     Added comments to the W25Q::formatFlashDrive()
  */
 #include <string.h>
 #include "flash.h"
@@ -35,7 +39,6 @@ FLASH_STATUS W25Q::init(void) {
 			f_rename(fn_tip_backup, fn_tip_calib);
 		}
 	}
-	umount();
 	return FLASH_OK;
 }
 
@@ -213,10 +216,10 @@ int16_t W25Q::saveTipData(TIP* tip, bool keep) {
 
 bool W25Q::formatFlashDrive(void) {
 	MKFS_PARM p;
-	p.fmt		= FM_FAT | FM_SFD;
-	p.au_size	= 4096;										// W25Q16 sector size
+	p.fmt		= FM_FAT | FM_SFD;							// No partition table
+	p.au_size	= 4096;										// W25Qxx sector size
 	p.align		= 0;										// 8
-	p.n_fat		= 1;
+	p.n_fat		= 1;										// Number of FAT copies
 	p.n_root	= 128;										// 32 bytes per entry, 4096 bytes, 1 sector!
 
 	uint8_t *buff = (uint8_t *)malloc(blk_size);
