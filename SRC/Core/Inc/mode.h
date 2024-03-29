@@ -1,8 +1,11 @@
 /*
  * mode.h
  *
- * 11/26/2022
- *   changed in_place_start and in_place_end values in the MSETUP class
+ * 2022 NOV 26
+ *     changed in_place_start and in_place_end values in the MSETUP class
+ *
+ * 2024 MAR 28
+ *     changed class MTACT to include pointer to the FAIL mode
  *
  */
 
@@ -92,39 +95,6 @@ class MSLCT : public MODE {
 		uint8_t			old_index = 0;
 		uint32_t		tip_disconnected	= 0;			// When the tip has been disconnected
 		bool			manual_change		= false;
-};
-
-//---------------------- The Activate tip mode: select tips to use ---------------
-class MTACT : public MODE {
-	public:
-		MTACT(HW *pCore) : MODE(pCore)						{ }
-		virtual void	init(void);
-		virtual MODE*	loop(void);
-	private:
-		uint8_t			old_index = 255;
-};
-
-//---------------------- The Menu mode -------------------------------------------
-class MMENU : public MODE {
-	public:
-		MMENU(HW* pCore, MODE* m_boost, MODE *m_change_tip, MODE *m_params, MODE* m_calib, MODE* m_act, MODE* m_tune, MODE* m_pid, MODE* m_gun_menu, MODE *m_about);
-		virtual void	init(void);
-		virtual MODE*	loop(void);
-	private:
-		MODE*		mode_menu_boost;
-		MODE*		mode_change_tip;
-		MODE*		mode_menu_setup;
-		MODE*		mode_calibrate_menu;
-		MODE*		mode_activate_tips;
-		MODE*		mode_tune;
-		MODE*		mode_tune_pid;
-		MODE*		mode_gun_menu;
-		MODE*		mode_about;
-		uint8_t		mode_menu_item 	= 1;					// Save active menu element index to return back later
-		const uint16_t	min_standby_C	= 120;				// Minimum standby temperature, Celsius
-		enum { MM_PARAMS = 0, MM_BOOST_SETUP, MM_CHANGE_TIP, MM_CALIBRATE_TIP, MM_ACTIVATE_TIPS, MM_TUNE_IRON, MM_GUN_MENU,
-			MM_RESET_CONFIG, MM_TUNE_IRON_PID, MM_ABOUT, MM_QUIT
-		};
 };
 
 //---------------------- The Setup menu mode -------------------------------------------
@@ -310,6 +280,41 @@ class MFAIL : public MODE {
 		t_msg_id		message	= MSG_LAST;
 };
 
+//---------------------- The Activate tip mode: select tips to use ---------------
+class MTACT : public MODE {
+	public:
+		MTACT(HW *pCore) : MODE(pCore)						{ }
+		virtual void	init(void);
+		virtual MODE*	loop(void);
+		void	setFail(MFAIL *pf)							{ pFail = pf; }
+	private:
+		uint8_t			old_index	= 255;
+		MFAIL			*pFail		= 0;					// Pointer to fail mode allows to display error message correctly
+};
+
+//---------------------- The Menu mode -------------------------------------------
+class MMENU : public MODE {
+	public:
+		MMENU(HW* pCore, MODE* m_boost, MODE *m_change_tip, MODE *m_params, MODE* m_calib, MODE* m_act, MODE* m_tune, MODE* m_pid, MODE* m_gun_menu, MODE *m_about);
+		virtual void	init(void);
+		virtual MODE*	loop(void);
+	private:
+		MODE*		mode_menu_boost;
+		MODE*		mode_change_tip;
+		MODE*		mode_menu_setup;
+		MODE*		mode_calibrate_menu;
+		MODE*		mode_activate_tips;
+		MODE*		mode_tune;
+		MODE*		mode_tune_pid;
+		MODE*		mode_gun_menu;
+		MODE*		mode_about;
+		uint8_t		mode_menu_item 	= 1;					// Save active menu element index to return back later
+		const uint16_t	min_standby_C	= 120;				// Minimum standby temperature, Celsius
+		enum { MM_PARAMS = 0, MM_BOOST_SETUP, MM_CHANGE_TIP, MM_CALIBRATE_TIP, MM_ACTIVATE_TIPS, MM_TUNE_IRON, MM_GUN_MENU,
+			MM_RESET_CONFIG, MM_TUNE_IRON_PID, MM_ABOUT, MM_QUIT
+		};
+};
+
 //---------------------- The About dialog mode. Show about message ---------------
 class MABOUT : public MODE {
 	public:
@@ -318,6 +323,9 @@ class MABOUT : public MODE {
 		virtual MODE*	loop(void);
 };
 
+
+#define GUN_TIM		htim1
+extern TIM_HandleTypeDef GUN_TIM;
 
 //---------------------- The Debug mode: display internal parameters ------------
 class MDEBUG : public MODE {
