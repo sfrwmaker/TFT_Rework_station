@@ -135,7 +135,7 @@ DRESULT disk_write (
 		{
 		uint32_t addr = sector << 12;	/* sector size is 4096 bytes */
 		uint16_t size = count  << 12;
-		W25Qxx_RET r = W25Qxx_Write(addr, buff, size);
+		W25Qxx_RET r = W25Qxx_Write(addr, (uint8_t *)buff, size);
 		switch (r) {
 		case W25Qxx_RET_ALIGN:
 		case W25Qxx_RET_SIZE:
