@@ -9,6 +9,12 @@
  *
  * 2024 MAR 28
  *	   Changed the MFAIL::loop() to manage long press of gun encoder button
+ *  2024 OCT 06, v.1.15
+ *  	Changed the MSETUP::init() and MSETUP::loop() to work with parameters in struct
+ *  	Added 'fast gun cooling' and 'display type' menu items in MSETUP::loop()
+ *  2024 OCT 9
+ *  	MOdified MABOUT::loop(). The flash debug and encoder debug modes are called from about dialog
+ *  	Modified MDEBUG::loop(). The flash debug mode called from about dialog
  */
 
 #include <stdio.h>
@@ -835,19 +841,9 @@ void MSETUP::init(void) {
 	CFG*	pCFG	= &pCore->cfg;
 	RENC*	pEnc	= &pCore->g_enc;
 
-	off_timeout		= pCFG->getOffTimeout();
-	low_temp		= pCFG->getLowTemp();
-	low_to			= pCFG->getLowTO();
-	buzzer			= pCFG->isBuzzerEnabled();
-	celsius			= pCFG->isCelsius();
-	reed			= pCFG->isReedType();
-	temp_step		= pCFG->isBigTempStep();
-	i_clock_wise	= pCFG->isIronEncClockWise();
-	g_clock_wise	= pCFG->isGunEncClockWise();
-	auto_start		= pCFG->isAutoStart();
+	pCFG->getMainParams(prm);
 	lang_index		= pCore->nls.languageIndex();
 	num_lang		= pCore->nls.numLanguages();
-	dspl_bright		= pCFG->getDsplBrightness();
 	dspl_rotation	= pCFG->getDsplRotation();
 	set_param		= 0;
 	uint8_t menu_len = pCore->dspl.menuSize(MSG_MENU_SETUP);
@@ -856,8 +852,6 @@ void MSETUP::init(void) {
 	pCore->dspl.clear();
 	pCore->dspl.drawTitle(MSG_MENU_SETUP);						// "Parameters"
 }
-
-
 
 MODE* MSETUP::loop(void) {
 	DSPL*	pD		= &pCore->dspl;
@@ -873,24 +867,24 @@ MODE* MSETUP::loop(void) {
 		switch (set_param) {									// Setup new value of the parameter in place
 			case MM_AUTO_OFF:									// Setup auto off timeout
 				if (item) {
-					off_timeout	= item + 2;
+					prm.off_timeout	= item + 2;
 				} else {
-					off_timeout = 0;
+					prm.off_timeout = 0;
 				}
 				break;
 			case MM_STANDBY_TEMP:								// Setup low power (standby) temperature
 				if (item >= min_standby_C) {
-					low_temp = item;
+					prm.low_temp = item;
 				} else {
-					low_temp = 0;
+					prm.low_temp = 0;
 				}
 				break;
 			case MM_STANDBY_TIME:								// Setup low power (standby) timeout
-				low_to	= item;
+				prm.low_to	= item;
 				break;
 			case MM_BRIGHT:
-				dspl_bright = constrain(item, 10, 255);
-				pCore->dspl.BRGT::set(dspl_bright);
+				prm.bright = constrain(item, 10, 255);
+				pCore->dspl.BRGT::set(prm.bright);
 				break;
 			case MM_ROTATION:
 				dspl_rotation = constrain(item, 0, 3);
@@ -912,30 +906,33 @@ MODE* MSETUP::loop(void) {
 		if (button > 0) {										// The button was pressed, current menu item can be selected for modification
 			switch (item) {										// item is a menu item
 				case MM_UNITS:									// units C/F
-					celsius	= !celsius;
+					prm.celsius	= !prm.celsius;
 					break;
 				case MM_BUZZER:									// buzzer ON/OFF
-					buzzer	= !buzzer;
+					prm.buzzer	= !prm.buzzer;
 					break;
 				case MM_I_ENC:
-					i_clock_wise = !i_clock_wise;
+					prm.i_enc = !prm.i_enc;
 					break;
 				case MM_G_ENC:
-					g_clock_wise = !g_clock_wise;
+					prm.g_enc = !prm.g_enc;
+					break;
+				case MM_FAST_COOL:								// Hot Air Gun fast cooling option
+					prm.fast_cooling = !prm.fast_cooling;
 					break;
 				case MM_SWITCH_TYPE:							// REED/TILT
-					reed = !reed;
+					prm.reed = !prm.reed;
 					break;
 				case MM_TEMP_STEP:								// Preset temperature step (1/5)
-					temp_step  = !temp_step;
+					prm.big_temp_step  = !prm.big_temp_step;
 					break;
 				case MM_AUTO_START:								// Automatic startup ON/OFF
-					auto_start = !auto_start;
+					prm.auto_start = !prm.auto_start;
 					break;
 				case MM_AUTO_OFF:								// auto off timeout
 					{
 					set_param = item;
-					uint8_t to = off_timeout;
+					uint8_t to = prm.off_timeout;
 					if (to > 2) to -=2;
 					pEnc->reset(to, 0, 28, 1, 1, false);
 					break;
@@ -945,16 +942,16 @@ MODE* MSETUP::loop(void) {
 					set_param = item;
 					uint16_t max_standby_C = pCFG->referenceTemp(0, d_t12);
 					// When encoder value is less than min_standby_C, disable low power mode
-					pEnc->reset(low_temp, min_standby_C-1, max_standby_C, 1, 5, false);
+					pEnc->reset(prm.low_temp, min_standby_C-1, max_standby_C, 1, 5, false);
 					break;
 					}
 				case MM_STANDBY_TIME:							// Standby timeout
 					set_param = item;
-					pEnc->reset(low_to, 1, 255, 1, 1, false);
+					pEnc->reset(prm.low_to, 1, 255, 1, 1, false);
 					break;
 				case MM_BRIGHT:
 					set_param = item;
-					pEnc->reset(dspl_bright, 10, 255, 1, 5, false);
+					pEnc->reset(prm.bright, 10, 255, 1, 5, false);
 					break;
 				case MM_ROTATION:
 					set_param = item;
@@ -965,6 +962,9 @@ MODE* MSETUP::loop(void) {
 						set_param = item;
 						pEnc->reset(lang_index, 0, num_lang-1, 1, 1, true);
 					}
+					break;
+				case MM_DSPL_TYPE:
+					prm.ips_display = !prm.ips_display;
 					break;
 				case MM_SAVE:									// save
 				{
@@ -984,12 +984,12 @@ MODE* MSETUP::loop(void) {
 						}
 					}
 					pCFG->setDsplRotation(dspl_rotation);
-					pCFG->setup(off_timeout, buzzer, celsius, reed, temp_step, i_clock_wise, g_clock_wise,
-									auto_start, low_temp, low_to, dspl_bright);
+					pCFG->setup(prm);
+					pCore->hotgun.setFastGunCooling(prm.fast_cooling);
 					pCFG->saveConfig();
-					pCore->i_enc.setClockWise(i_clock_wise);
-					pCore->g_enc.setClockWise(g_clock_wise);
-					pCore->buzz.activate(buzzer);
+					pCore->i_enc.setClockWise(prm.i_enc);
+					pCore->g_enc.setClockWise(prm.g_enc);
+					pCore->buzz.activate(prm.buzzer);
 					//pCore->dspl.rotate((tRotation)dspl_rotation);
 					mode_menu_item = 0;
 					return mode_return;
@@ -1032,44 +1032,44 @@ MODE* MSETUP::loop(void) {
 	switch (item) {
 		case MM_UNITS:											// units: C/F
 			item_value[0] = 'F';
-			if (celsius)
+			if (prm.celsius)
 				item_value[0] = 'C';
 			break;
 		case MM_BUZZER:											// Buzzer setup
-			sprintf(item_value, buzzer?msg_on:msg_off);
+			sprintf(item_value, prm.buzzer?msg_on:msg_off);
 			break;
 		case MM_SWITCH_TYPE:									// TILT/REED
-			strncpy(item_value, pD->msg((reed)?MSG_REED:MSG_TILT), value_length);
+			strncpy(item_value, pD->msg((prm.reed)?MSG_REED:MSG_TILT), value_length);
 			break;
 		case MM_TEMP_STEP:										// Preset temperature step (1/5)
-			sprintf(item_value, "%1d ", temp_step?5:1);
+			sprintf(item_value, "%1d ", prm.big_temp_step?5:1);
 			strncpy(&item_value[2], pD->msg(MSG_DEG), value_length-2);
 			break;
 		case MM_AUTO_START:										// Auto start ON/OFF
-			sprintf(item_value, auto_start?msg_on:msg_off);
+			sprintf(item_value, prm.auto_start?msg_on:msg_off);
 			break;
 		case MM_AUTO_OFF:										// auto off timeout
-			if (off_timeout) {
-				sprintf(item_value, "%2d ", off_timeout);
+			if (prm.off_timeout) {
+				sprintf(item_value, "%2d ", prm.off_timeout);
 				strncpy(&item_value[3], pD->msg(MSG_MINUTES), value_length - 3);
 			} else {
 				strncpy(item_value, pD->msg(MSG_OFF), value_length);
 			}
 			break;
 		case MM_STANDBY_TEMP:									// Standby temperature
-			if (low_temp) {
-				if (celsius) {
-					sprintf(item_value, "%3d C", low_temp);
+			if (prm.low_temp) {
+				if (prm.celsius) {
+					sprintf(item_value, "%3d C", prm.low_temp);
 				} else {
-					sprintf(item_value, "%3d F", celsiusToFahrenheit(low_temp));
+					sprintf(item_value, "%3d F", celsiusToFahrenheit(prm.low_temp));
 				}
 			} else {
 				strncpy(item_value, pD->msg(MSG_OFF), value_length);
 			}
 			break;
 		case MM_STANDBY_TIME:									// Standby timeout (5 secs intervals)
-			if (low_temp) {
-				uint16_t to = (uint16_t)low_to * 5;				// Timeout in seconds
+			if (prm.low_temp) {
+				uint16_t to = (uint16_t)prm.low_to * 5;			// Timeout in seconds
 				if (to < 60) {
 					sprintf(item_value, "%2d ", to);
 					strncpy(&item_value[3], pD->msg(MSG_SECONDS), value_length - 3);
@@ -1094,13 +1094,16 @@ MODE* MSETUP::loop(void) {
 			}
 			break;
 		case MM_I_ENC:
-			strncpy(item_value, pD->msg((i_clock_wise)?MSG_CW:MSG_CCW), value_length);
+			strncpy(item_value, pD->msg((prm.i_enc)?MSG_CW:MSG_CCW), value_length);
 			break;
 		case MM_G_ENC:
-			strncpy(item_value, pD->msg((g_clock_wise)?MSG_CW:MSG_CCW), value_length);
+			strncpy(item_value, pD->msg((prm.g_enc)?MSG_CW:MSG_CCW), value_length);
+			break;
+		case MM_FAST_COOL:
+			sprintf(item_value, prm.fast_cooling?msg_on:msg_off);
 			break;
 		case MM_BRIGHT:
-			sprintf(item_value, "%3d", dspl_bright);
+			sprintf(item_value, "%3d", prm.bright);
 			break;
 		case MM_ROTATION:
 			sprintf(item_value, "%3d", dspl_rotation*90);
@@ -1110,6 +1113,9 @@ MODE* MSETUP::loop(void) {
 			std::string	l_name = pCore->nls.languageName(lang_index);
 			strncpy(item_value, l_name.c_str(), value_length);
 		}
+			break;
+		case MM_DSPL_TYPE:
+			strncpy(item_value, pD->msg((prm.ips_display)?MSG_DSPL_IPS:MSG_DSPL_TFT), value_length);
 			break;
 		default:
 			item_value[0] = '\0';
@@ -2331,28 +2337,33 @@ void MABOUT::init(void) {
 	update_screen = 0;
 }
 
+// Call another mode depending on encoder button pressed:
+// 	IRON encoder short pressed -> Encoder test mode (mode_spress)
+// 	IRON encoder long  pressed -> Flash debug mode (flash_debug)
+// 	GUN  encoder short pressed -> Return to the main work mode (mode_return)
+// 	GUN  encoder long  pressed -> Debug mode (mode_lpress)
 MODE* MABOUT::loop(void) {
-	DSPL*	pD		= &pCore->dspl;
-	RENC*	pEnc	= &pCore->g_enc;
-	uint8_t b_status = pEnc->buttonStatus();
+	uint8_t b_status = pCore->g_enc.buttonStatus();
 	if (b_status == 1) {										// Short button press
 		return mode_return;										// Return to the main menu
 	} else if (b_status == 2) {
 		return mode_lpress;										// Activate debug mode
 	}
+	b_status = pCore->i_enc.buttonStatus();
+	if (b_status == 1) {
+		return mode_spress;										// Activate encoder test mode
+	} else if (b_status == 2) {
+		return flash_debug;										// Activate flash debug mode
+	}
 
 	if (HAL_GetTick() < update_screen) return this;
 	update_screen = HAL_GetTick() + 60000;
 
-	pD->showVersion();
+	pCore->dspl.showVersion();
 	return this;
 }
 
 //---------------------- The Debug mode: display internal parameters ------------
-MDEBUG::MDEBUG(HW *pCore, MODE* flash_debug) : MODE(pCore)	{
-	this->flash_debug = flash_debug;
-}
-
 void MDEBUG::init(void) {
 	pCore->i_enc.reset(0, 0, max_iron_power, 1, 5, false);
 	pCore->g_enc.reset(min_fan_speed, min_fan_speed, max_fan_power,  1, 1, false);
@@ -2395,10 +2406,6 @@ MODE* MDEBUG::loop(void) {
 		}
 	}
 
-	if (pCore->i_enc.buttonStatus() == 2) {						// The iron button was pressed for a long time, launch flash debug mode
-		if (flash_debug)
-			return flash_debug;
-	}
 	if (pCore->g_enc.buttonStatus() == 2) {						// The Hot Air Gun button was pressed for a long time, exit debug mode
 	   	return mode_lpress;
 	}
@@ -2557,4 +2564,45 @@ void FDEBUG::readDirectory(void) {
 	f_closedir(&dir);
 	old_ge = dir_list.size();										// Force to redraw screen
 	pCore->g_enc.reset(0, 0, old_ge-1, 1, 1, false);				// Select directory entry by the rotary encoder
+}
+
+//---------------------- The Encoder debug mode: check encoders -----------------
+void MENCODER::init(void) {
+	pCore->i_enc.reset(start_pos, 0, 999, 1, 1, true);
+	pCore->g_enc.reset(start_pos, 0, 999, 1, 1, false);
+	i_enc = g_enc = start_pos;
+	pCore->dspl.clear();
+	pCore->dspl.drawTitleString("Encoder debug");
+	update_screen	= 0;
+	resetTimeout();
+};
+
+MODE* MENCODER::loop(void) {
+	uint16_t enc = pCore->i_enc.read();
+	if (enc != i_enc) {												// Force to redraw the display
+		update_screen = 0;
+		i_enc = enc;
+		resetTimeout();
+	}
+	enc = pCore->g_enc.read();
+	if (enc != g_enc) {
+		update_screen = 0;
+		g_enc = enc;
+		resetTimeout();
+	}
+	uint8_t i_b = pCore->i_enc.buttonStatus();
+	uint8_t g_b = pCore->g_enc.buttonStatus();
+	if (i_b > 0 || g_b > 0) {
+		update_screen = 0;
+		resetTimeout();
+	}
+
+	if (HAL_GetTick() > update_screen) {
+		update_screen = HAL_GetTick() + 1000;
+		uint32_t i_ints = pCore->i_enc.intNumber();					// Number of iron encoder interrupts received
+		uint32_t g_ints = pCore->g_enc.intNumber();
+		uint8_t  ret = (time_to_return - HAL_GetTick()) / 1000;
+		pCore->dspl.encoderDebugShow(i_enc, i_ints, i_b, g_enc, g_ints, g_b, ret);
+	}
+	return this;													// Return from the encoder debug mode by timeout
 }

@@ -4,6 +4,8 @@
  * 2022 Nov 9
  *     Changed HOTGUN::switchPower() POWER_FIXED: if the gun is not connected -> shutdown()
  *     								POWER_ON: if not connected -> shutdown()
+ * 2024 OCT 06, 1.1.15
+ * 		Implemented the fast_cooling feature in the HOTGUN::switchPower() and HOTGUN::power()
  *
  */
 
@@ -94,6 +96,9 @@ void HOTGUN::switchPower(bool On) {
 					mode = POWER_COOLING;
 					fan_off_time = HAL_GetTick() + fan_off_timeout;
 					reach_cold_temp = false;
+					if (fast_cooling) {						// Set maximum fan speed in case of fast cooling
+						TIM2->CCR2 = max_cool_fan;
+					}
 				} else {
 					shutdown();
 				}
@@ -111,6 +116,9 @@ void HOTGUN::switchPower(bool On) {
 							mode = POWER_COOLING;
 							fan_off_time = HAL_GetTick() + fan_off_timeout;
 							reach_cold_temp = false;
+							if (fast_cooling) {				// Set maximum fan speed in case of fast cooling
+								TIM2->CCR2 = max_cool_fan;
+							}
 						}
 					} else {
 						shutdown();
@@ -224,9 +232,11 @@ uint16_t HOTGUN::power(void) {
 							fan_off_time = HAL_GetTick() + extra_cool_to;
 						}
 					} else {								// FAN && connected && !cold
-						uint16_t fan = map(h_temp.read(), temp_gun_cold, temp_set, max_cool_fan, min_fan_speed);
-						fan = constrain(fan, min_fan_speed, max_fan_speed);
-						TIM2->CCR2 = fan;
+						if (!fast_cooling) {				// Use standard cooling algorithm
+							uint16_t fan = map(h_temp.read(), temp_gun_cold, temp_set, max_cool_fan, min_fan_speed);
+							fan = constrain(fan, min_fan_speed, max_fan_speed);
+							TIM2->CCR2 = fan;
+						}
 					}
 				}
 				// Here the FAN is working but the Hot Air Gun can be disconnected

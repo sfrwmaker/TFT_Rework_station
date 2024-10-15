@@ -3,6 +3,9 @@
  *
  *  Created on: 15 aug. 2019.
  *      Author: Alex
+ *
+ *  2024 OCT 09, v.1.15
+ *  	Added RENC::intNuber() method that used in debug mode
  */
 
 #include "encoder.h"
@@ -116,4 +119,11 @@ void RENC::encoderIntr(void) {								// Interrupt function, called when the cha
 			rpt = 0;
 		}
 	}
+	++enc_int;
+}
+
+uint32_t RENC::intNumber(void) {
+	uint32_t i = enc_int;
+	enc_int = 0;
+	return i;
 }

@@ -7,14 +7,16 @@
  *  2022 Nov 6
  *  	added t_amb.reset() to the HW::init() method to initialize the default ambient temperature
  *  2023 JAN 01
- *      Added hardware initialization code (temperaatures) into HW::init() method
+ *      Added hardware initialization code (temperatures) into HW::init() method
+ *  2024 OCT 06, v.1.15
+ *  	Modified the HW::init() to implement fast Hot Gun cooling feature
+ *  	Modified the HW::init() to implement two display types ili9341 and ili9341v
  */
 
 #include <math.h>
 #include "hw.h"
 
 CFG_STATUS HW::init(uint16_t t12_temp, uint16_t gun_temp, uint16_t ambient) {
-	dspl.init();
 	t_amb.length(ambient_emp_coeff);
 	t_amb.reset(ambient);									// Initialize the ambient temperature
 	iron.init(t12_temp);
@@ -24,6 +26,7 @@ CFG_STATUS HW::init(uint16_t t12_temp, uint16_t gun_temp, uint16_t ambient) {
 	g_enc.addButton(G_ENC_B_GPIO_Port, G_ENC_B_Pin);
 	CFG_STATUS cfg_init = 	cfg.init();
 	if (cfg_init == CFG_OK || cfg_init == CFG_NO_TIP) {		// Load NLS configuration data
+		dspl.init(cfg.isIPS());
 		nls.init(&dspl);									// Setup pointer to NLS_MSG class instance to setup messages by NLS_MSG::set() method
 		const char *l = cfg.getLanguage();					// Configured language name (string)
 		nls.loadLanguageData(l);
@@ -32,6 +35,7 @@ CFG_STATUS HW::init(uint16_t t12_temp, uint16_t gun_temp, uint16_t ambient) {
 		uint8_t r = cfg.getDsplRotation();
 		dspl.rotate((tRotation)r);
 	} else {
+		dspl.init();
 		dspl.setLetterFont(0);								// Set default font, reallocate the bitmap for 3-digits field
 		dspl.rotate(TFT_ROTATION_90);
 	}
@@ -40,6 +44,8 @@ CFG_STATUS HW::init(uint16_t t12_temp, uint16_t gun_temp, uint16_t ambient) {
 	iron.load(pp);
 	pp					=	cfg.pidParams(d_gun);			// load Hot Air Gun PID parameters
 	hotgun.load(pp);
+	bool fast_cooling	=	cfg.isFastGunCooling();
+	hotgun.setFastGunCooling(fast_cooling);
 	buzz.activate(cfg.isBuzzerEnabled());
 	i_enc.setClockWise(cfg.isIronEncClockWise());
 	g_enc.setClockWise(cfg.isGunEncClockWise());

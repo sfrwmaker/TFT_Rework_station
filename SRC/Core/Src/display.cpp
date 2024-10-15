@@ -5,6 +5,15 @@
  * 	Changed the timeToOff() function to use the bitmap to draw the remaining time value
  * 	Changed the drawFanPcnt() function to disable clearing bottom area
  *
+ * 2022 Dec 2
+ *    	Changed BRGT::adjust() to use the timer instance
+ * 2022 DEC 26
+ *    	Changed DSPL::debugShow() to show the GUN timer period
+ * 2024 OCT 09, v.1.15
+ * 		Added DSPL::encoderDebugShow()
+ *		Added DSPL::drawButtonStatus()
+ * 2024 OCT 12
+ * 		Added IPS display support to DSPL::init()
  */
 
 #include <string.h>
@@ -212,25 +221,25 @@ static const char* k_proto[3] = {
 };
 
 bool BRGT::adjust(void) {
-	if (brightness > TIM3->CCR1) {
-		if (brightness - TIM3->CCR1 > 8) {
-			TIM3->CCR1 += 8;
+	if (brightness > TFT_TIM.Instance->CCR1) {
+		if (brightness - TFT_TIM.Instance->CCR1 > 8) {
+			TFT_TIM.Instance->CCR1 += 8;
 		} else {
-			++TIM3->CCR1;
+			++TFT_TIM.Instance->CCR1;
 		}
 		return true;
-	} else if (brightness < TIM3->CCR1) {
-		if (TIM3->CCR1 - brightness > 8) {
-			TIM3->CCR1 -= 8;
+	} else if (brightness < TFT_TIM.Instance->CCR1) {
+		if (TFT_TIM.Instance->CCR1 - brightness > 8) {
+			TFT_TIM.Instance->CCR1 -= 8;
 		} else {
-			--TIM3->CCR1;
+			--TFT_TIM.Instance->CCR1;
 		}
 		return true;
 	}
 	return false;
 }
 
-void DSPL::init(void) {
+void DSPL::init(bool ips) {
 	// Allocate Bitmap for temperature string (3 symbols)
 	setFont(big_dgt_font);
 	setFontScale(2);
@@ -246,7 +255,11 @@ void DSPL::init(void) {
 	w	= getStrWidth("0000") + 2;
 	bm_adc_read	= BITMAP(w, h);
 
-	tft_ILI9341::init();									// Also setup display rotation
+	if (ips) {
+		tft_ILI9341::initIPS();								// Use IPS display type
+	} else {
+		tft_ILI9341::init();								// Also setup display rotation
+	}
 	BRGT::start();
 	BRGT::set(0);											// Minimum brightness
 	BRGT::on();												// Apply brightness value to the timer counter
@@ -1110,7 +1123,7 @@ void DSPL::showVersion(void) {
 	drawStr(x, h*3+top, buff, fg_color);
 }
 
-void DSPL::debugShow(uint16_t data[9], bool iron_on, bool gun_on, bool iron_connected, bool gun_connected) {
+void DSPL::debugShow(uint16_t data[9], bool iron_on, bool gun_on, bool iron_connected, bool gun_connected, bool is_ac_ok) {
 	static const char *item_name[9] = {
 			"irnC:",
 			"funC:",
@@ -1149,7 +1162,9 @@ void DSPL::debugShow(uint16_t data[9], bool iron_on, bool gun_on, bool iron_conn
 		sprintf(buff, "%5d", data[i+2]);
 		strToBitmap(bm, item_name[i+2], align_left);
 		strToBitmap(bm, buff, align_right);
-		drawScrolledBitmap(width()/2+10, top+i*h, bm.width(), bm, 0, 0, bg_color, fg_color);
+		uint16_t clr = fg_color;
+		if (i == 5 && !is_ac_ok) clr = gd_color;						// GUN_TIM status
+		drawScrolledBitmap(width()/2+10, top+i*h, bm.width(), bm, 0, 0, bg_color, clr);
 	}
 	sprintf(buff, "(%c-%c)", iron_connected?'i':' ', gun_connected?'g':' ');
 	bm.clear();
@@ -1164,15 +1179,35 @@ void DSPL::debugMessage(const char *msg, uint16_t x, uint16_t y, uint16_t len) {
 	drawStr(x, y+h, msg, fg_color);
 }
 
+void DSPL::encoderDebugShow(uint16_t i_enc, uint32_t i_ints, uint8_t i_b, uint16_t g_enc, uint32_t g_ints, uint8_t g_b, uint8_t ret) {
+	if (i_ints > 999) i_ints = 999;
+	if (g_ints > 999) g_ints = 999;
+	drawTemp(i_enc, u_upper, fg_color);
+	drawTempSet(i_ints, u_upper);
+	drawButtonStatus(i_b, 10, iron_temp_y + 30, fg_color);
+
+	drawTemp(g_enc, u_lower, fg_color);
+	drawTempSet(g_ints, u_lower);
+	drawButtonStatus(g_b, 10, gun_temp_y  + 30, fg_color);
+
+	char b[20];
+	sprintf(b, "return in %2d sec", ret);
+	setFont(letter_font);
+	uint16_t h	= getMaxCharHeight();
+	BITMAP bm(200, h);
+	strToBitmap(bm, b, align_center);
+	drawBitmap((width() - 200)>>1, height()-h, bm, bg_color, dim_color);
+}
+
 void DSPL::checkBox(BITMAP &bm, uint16_t x, uint8_t size, bool checked) {
 	uint16_t w = bm.width();
 	uint8_t  h = bm.height();
 	if (w == 0  || size == 0 || x+size > w || size > h) return;
 	uint8_t y = (h - size) >> 1;
-	bm.drawHLine(x, y, size);									// Top horizontal line
-	bm.drawHLine(x, y+size-1, size);								// Bottom horizontal line
-	bm.drawVLine(x, y+1, size-2);								// Left vertical line
-	bm.drawVLine(x+size-1, y+1, size-2);							// Right vertical line
+	bm.drawHLine(x, y, size);											// Top horizontal line
+	bm.drawHLine(x, y+size-1, size);									// Bottom horizontal line
+	bm.drawVLine(x, y+1, size-2);										// Left vertical line
+	bm.drawVLine(x+size-1, y+1, size-2);								// Right vertical line
 	if (checked && size > 6) {
 		for (uint16_t i = 0; i < size - 6; ++i) {						// Fill-up the square box
 			bm.drawHLine(x+3, y+3+i, size-6);
@@ -1226,6 +1261,21 @@ void DSPL::drawValue(uint16_t value, uint16_t x, uint16_t y, BM_ALIGN align, uin
 	setFont(letter_font);
 	bm_preset.clear();
 	strToBitmap(bm_preset, b, align);
+	drawBitmap(x, y, bm_preset, bg_color, color);
+}
+
+void DSPL::drawButtonStatus(uint8_t button, uint16_t x, uint16_t y, uint16_t color) {
+	char b[6];
+	if (button == 1) {
+		sprintf(b, "sht");												// Short pressed
+	} else if (button == 2) {											// Long pressed
+		sprintf(b, "lng");
+	} else {
+		b[0] = '-'; b[1] = 0;
+	}
+	setFont(letter_font);
+	bm_preset.clear();
+	strToBitmap(bm_preset, b, align_center);
 	drawBitmap(x, y, bm_preset, bg_color, color);
 }
 

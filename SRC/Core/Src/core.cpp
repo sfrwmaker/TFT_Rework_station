@@ -15,6 +15,8 @@
  *  2024 MAR 28
  *     Changed void setup(). When the FLASH failed to read, the fail mode would return to flash_debug mode only
  *     Added active.setFail() call
+ *  2024 OCT 09, v.1.15
+ *  	Changed MABOUT and MDEBUG constructors. The flash debug mode now is calling from about dialog.
  */
 
 #include "core.h"
@@ -55,13 +57,12 @@ static	MFAIL			fail(&core);
 static	MMBST			boost_setup(&core);
 static	MTPID			pid_tune(&core);
 static 	MAUTOPID		auto_pid(&core);
-//static	MENU_GUN		gun_menu(&core, &calib_manual, &tune, &auto_pid);
 static	MENU_GUN		gun_menu(&core, &calib_manual, &tune, &pid_tune);
-static  MABOUT			about(&core);
 static	FDEBUG			flash_debug(&core, &fail);
-static  MDEBUG			debug(&core, &flash_debug);
+static  MABOUT			about(&core, &flash_debug);
+static	MENCODER		enc_debug(&core);
+static  MDEBUG			debug(&core);
 static	MSETUP			param_menu(&core);
-//static	MMENU			main_menu(&core, &boost_setup, &param_menu, &calib_menu, &activate, &tune, &auto_pid, &gun_menu, &about);
 static	MMENU			main_menu(&core, &boost_setup, &iselect, &param_menu, &calib_menu, &activate, &tune, &pid_tune, &gun_menu, &about);
 static	MODE*           pMode = &work;
 
@@ -156,10 +157,11 @@ extern "C" void setup(void) {
 	gun_menu.setup(&main_menu, &work, &work);
 	param_menu.setup(&main_menu, &work, &work);
 	main_menu.setup(&work, &work, &work);
-	about.setup(&work, &work, &debug);
+	about.setup(&work, &enc_debug, &debug);						// Gun short, IRON short, GUN long
 	debug.setup(&work, &work, &work);
 	flash_debug.setup(&fail, &work, &work);
 	auto_pid.setup(&work, &pid_tune, &pid_tune);
+	enc_debug.setup(&work, 0, 0);
 
 	core.dspl.clear();
 	switch (cfg_init) {

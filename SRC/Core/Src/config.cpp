@@ -6,6 +6,9 @@
  *
  *  2024 MAR 28
  *      Changed CFG::toggleTipActivation(). The variable tip_index now is signed, as soon as the saveTipData() returns -1 in case of error
+ *  2024 OCT 06, v.1.15
+ *  	Changed the CFG_CORE::setup(), using the struct instead of parameter list
+ *  	Added CFG_CORE::getMainParams() method
  */
 
 #include <stdlib.h>
@@ -484,15 +487,30 @@ const char *CFG_CORE::getLanguage(void) {
 	return a_cfg.language;
 }
 
+void CFG_CORE::getMainParams(t_setup_arg &prm) {
+	prm.celsius			= a_cfg.bit_mask & CFG_CELSIUS;
+	prm.buzzer			= a_cfg.bit_mask & CFG_BUZZER;
+	prm.reed			= a_cfg.bit_mask & CFG_SWITCH;
+	prm.big_temp_step	= a_cfg.bit_mask & CFG_BIG_STEP;
+	prm.auto_start		= a_cfg.bit_mask & CFG_AU_START;
+	prm.i_enc			= a_cfg.bit_mask & CFG_I_CLOCKWISE;
+	prm.g_enc			= a_cfg.bit_mask & CFG_G_CLOCKWISE;
+	prm.fast_cooling	= a_cfg.bit_mask & CFG_FAST_COOLING;
+	prm.ips_display		= a_cfg.bit_mask & CFG_DSPL_TYPE;
+	prm.off_timeout		= a_cfg.off_timeout;
+	prm.low_temp		= a_cfg.low_temp;
+	prm.low_to			= a_cfg.low_to;
+	prm.bright			= a_cfg.dspl_bright;
+}
+
 // Apply main configuration parameters: automatic off timeout, buzzer and temperature units
-void CFG_CORE::setup(uint8_t off_timeout, bool buzzer, bool celsius, bool reed, bool big_temp_step, bool i_enc, bool g_enc,
-						bool auto_start, uint16_t low_temp, uint8_t low_to, uint8_t bright) {
+void CFG_CORE::setup(t_setup_arg &arg) {
 	bool cfg_celsius		= a_cfg.bit_mask & CFG_CELSIUS;
-	a_cfg.off_timeout		= off_timeout;
-	a_cfg.low_temp			= low_temp;
-	a_cfg.low_to			= low_to;
-	if (cfg_celsius	!= celsius) {							// When we change units, the temperature should be converted
-		if (celsius) {										// Translate preset temp. from Fahrenheit to Celsius
+	a_cfg.off_timeout		= arg.off_timeout;
+	a_cfg.low_temp			= arg.low_temp;
+	a_cfg.low_to			= arg.low_to;
+	if (cfg_celsius	!= arg.celsius) {						// When we change units, the temperature should be converted
+		if (arg.celsius) {									// Translate preset temp. from Fahrenheit to Celsius
 			a_cfg.iron_temp	= fahrenheitToCelsius(a_cfg.iron_temp);
 			a_cfg.gun_temp	= fahrenheitToCelsius(a_cfg.gun_temp);
 		} else {											// Translate preset temp. from Celsius to Fahrenheit
@@ -501,14 +519,16 @@ void CFG_CORE::setup(uint8_t off_timeout, bool buzzer, bool celsius, bool reed, 
 		}
 	}
 	a_cfg.bit_mask	= 0;
-	if (celsius)		a_cfg.bit_mask |= CFG_CELSIUS;
-	if (buzzer)			a_cfg.bit_mask |= CFG_BUZZER;
-	if (reed)			a_cfg.bit_mask |= CFG_SWITCH;
-	if (big_temp_step)	a_cfg.bit_mask |= CFG_BIG_STEP;
-	if (i_enc)			a_cfg.bit_mask |= CFG_I_CLOCKWISE;
-	if (g_enc)			a_cfg.bit_mask |= CFG_G_CLOCKWISE;
-	if (auto_start) 	a_cfg.bit_mask |= CFG_AU_START;
-	a_cfg.dspl_bright	= constrain(bright, 10, 255);
+	if (arg.celsius)		a_cfg.bit_mask |= CFG_CELSIUS;
+	if (arg.buzzer)			a_cfg.bit_mask |= CFG_BUZZER;
+	if (arg.reed)			a_cfg.bit_mask |= CFG_SWITCH;
+	if (arg.big_temp_step)	a_cfg.bit_mask |= CFG_BIG_STEP;
+	if (arg.i_enc)			a_cfg.bit_mask |= CFG_I_CLOCKWISE;
+	if (arg.g_enc)			a_cfg.bit_mask |= CFG_G_CLOCKWISE;
+	if (arg.fast_cooling)	a_cfg.bit_mask |= CFG_FAST_COOLING;
+	if (arg.auto_start) 	a_cfg.bit_mask |= CFG_AU_START;
+	if (arg.ips_display)	a_cfg.bit_mask |= CFG_DSPL_TYPE;
+	a_cfg.dspl_bright	= constrain(arg.bright, 10, 255);
 }
 
 void CFG_CORE::savePresetTempHuman(uint16_t temp_set) {
