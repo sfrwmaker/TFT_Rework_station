@@ -61,3 +61,7 @@ Jan 01, 2023, 1 1.13
 Mar 29, 2024, v 1.14
 * Updated the W25Qxx library
 * Fixed some issues regarded read and write operations on FLASH
+
+Oct 15, 2024, v 1.15
+* Added support for IPS display, display drier - ILI9341v.
+* Implemented fast hot air gun cooling procedure.
