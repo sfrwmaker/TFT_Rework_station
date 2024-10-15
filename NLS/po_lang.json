@@ -48,6 +48,7 @@
 			"buzzer":					"Buzzer",
 			"iron encoder":				"Enkoder lutow.",
 			"gun encoder":				"Enkoder hot-air",
+			"fast gun chill":			"szybkie chłodzenie",
 			"switch type":				"Typ czujnika",
 			"temp. step":				"Skok temperatury",
 			"auto start":				"auto start",
@@ -56,6 +57,7 @@
 			"standby time":				"Czas oczekiwania",
 			"brightness":				"Jasność",
 			"language":					"Język",
+			"display type":				"typ wyświetlacza",
 			"save":						"Zapisać",
 			"cancel":					"Anuluj"
 		},

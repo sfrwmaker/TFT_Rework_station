@@ -50,6 +50,7 @@
 			"buzzer":					"Buzzer",
 			"iron encoder":				"Encoder Ferro",
 			"gun encoder":				"Encoder Ar-Quente",
+			"fast gun chill":			"arma rápida e fria",
 			"switch type":				"Tipo de Chave",
 			"temp. step":				"Incremento Temp",
 			"auto start":				"Auto Iniciar",
@@ -59,6 +60,7 @@
 			"brightness":				"Brilho",
 			"rotation":					"rotação",
 			"language":					"Idioma",
+			"display type":				"tipo de exibição",
 			"save":						"Salvar",
 			"cancel":					"Cancelar"
 		},

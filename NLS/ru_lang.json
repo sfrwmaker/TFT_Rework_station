@@ -55,6 +55,7 @@
 			"buzzer":					"зуммер",
 			"iron encoder":				"энкодер паяльника",
 			"gun encoder":				"энкодер фена",
+			"fast gun chill":			"быстрое охл.",
 			"switch type":				"тип датчика",
 			"temp. step":				"шаг температуры",
 			"auto start":				"автостарт",
@@ -64,6 +65,7 @@
 			"brightness":				"яркость",
 			"rotation":					"поворот",
 			"language":					"язык",
+			"display type":				"Тип экрана",
 			"save":						"сохранить",
 			"cancel":					"отмена"
 		},
