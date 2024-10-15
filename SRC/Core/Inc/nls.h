@@ -3,6 +3,10 @@
  *
  * 2022 Nov 6
  *    Removed 'change tip' menu item from parameters menu
+ * 	2024 OCT 06, v.1.15
+ * 		Added "fast gun chill" setup menu item
+ * 		Added "display type" setup menu item
+ * 		Added "IPS" and "TFT" messages
  *
  */
 
@@ -11,12 +15,12 @@
 
 #include <string>
 
-typedef enum e_msg { MSG_MENU_MAIN, MSG_MENU_SETUP = 12, MSG_MENU_BOOST = 12+16, MSG_MENU_CALIB = 12+16+4, MSG_MENU_GUN = 12+16+4+5,
-					MSG_ON = 12+16+4+5+6, MSG_OFF, MSG_FAN, MSG_PWR, MSG_REF_POINT, MSG_REED, MSG_TILT, MSG_DEG, MSG_MINUTES, MSG_SECONDS,
+typedef enum e_msg { MSG_MENU_MAIN, MSG_MENU_SETUP = 12, MSG_MENU_BOOST = 12+18, MSG_MENU_CALIB = 12+18+4, MSG_MENU_GUN = 12+18+4+5,
+					MSG_ON = 12+18+4+5+6, MSG_OFF, MSG_FAN, MSG_PWR, MSG_REF_POINT, MSG_REED, MSG_TILT, MSG_DEG, MSG_MINUTES, MSG_SECONDS,
 					MSG_CW, MSG_CCW, MSG_SET, MSG_ERROR, MSG_TUNE_PID, MSG_SELECT_TIP,
 					MSG_EEPROM_READ, MSG_EEPROM_WRITE, MSG_EEPROM_DIRECTORY, MSG_FORMAT_EEPROM, MSG_FORMAT_FAILED,
 					MSG_SAVE_ERROR, MSG_HOT_AIR_GUN, MSG_SAVE_Q, MSG_YES, MSG_NO, MSG_DELETE_FILE, MSG_FLASH_DEBUG,
-					MSG_SD_MOUNT, MSG_SD_NO_CFG, MSG_SD_NO_LANG, MSG_SD_MEMORY, MSG_SD_INCONSISTENT,
+					MSG_SD_MOUNT, MSG_SD_NO_CFG, MSG_SD_NO_LANG, MSG_SD_MEMORY, MSG_SD_INCONSISTENT, MSG_DSPL_IPS, MSG_DSPL_TFT,
 					MSG_LAST,
 					MSG_ACTIVATE_TIPS 	= MSG_MENU_MAIN + 5,
 					MSG_TUNE_IRON		= MSG_MENU_MAIN + 6,
@@ -61,6 +65,7 @@ class NLS_MSG {
 				{"buzzer",			std::string()},
 				{"iron encoder",	std::string()},
 				{"gun encoder",		std::string()},
+				{"fast gun chill",	std::string()},
 				{"switch type",		std::string()},
 				{"temp. step",		std::string()},
 				{"auto start",		std::string()},
@@ -70,6 +75,7 @@ class NLS_MSG {
 				{"brightness",		std::string()},			// Change in-place menu item
 				{"rotation",		std::string()},			// Change in-place menu item
 				{"language",		std::string()},			// Change in-place menu item
+				{"display type",	std::string()},
 				{"save",			std::string()},
 				{"cancel",			std::string()},
 				// BOOST MENU
@@ -123,7 +129,9 @@ class NLS_MSG {
 				{"NO config file",			std::string()},
 				{"No lang. specified",		std::string()},
 				{"No memory",				std::string()},
-				{"Inconsistent lang",		std::string()}
+				{"Inconsistent lang",		std::string()},
+				{"IPS",						std::string()},
+				{"TFT",						std::string()}
 		};
 		const t_msg_id menu[5] = { MSG_MENU_MAIN, MSG_MENU_SETUP, MSG_MENU_BOOST, MSG_MENU_CALIB, MSG_MENU_GUN };
 };

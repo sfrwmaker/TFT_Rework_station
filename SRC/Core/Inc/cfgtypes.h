@@ -6,6 +6,9 @@
  *
  * 2022 Nov 6
  *    Removed 'CFG_TIP_MANUAL' configuration parameter
+ *  2024 OCT 06 v.1.15
+ *  	Added CFG_FAST_COOLING and CFG_DSPL_TYPE entries to the CFG_BIT_MASK
+ *  	Changed the type of bit_mask field (uint8_t -> uint16_t) in the RECORD struct.
  */
 
 #ifndef CFGTYPES_H_
@@ -18,9 +21,16 @@
  * CFG_CELSIUS		- The temperature units: Celsius (1) or Fahrenheit (0)
  * CFG_BUZZER		- Is the Buzzer Enabled (1)
  * CFG_SWITCH		- Switch type: Tilt (0) or REED (1)
+ * CFG_AU_START		- Powering on the HAkko T12 iron at startup
+ * CFG_U_CLOCKWISE	- Upper Encoder increments clockwise
+ * CFG_L_CLOCKWISE	- Lower Encoder increments clockwise
+ * CFG_FAST_COOLING	- Start cooling the Hot Air Gun at maximum fan speed
+ * CFG_BIG_STEP		- The temperature step 1 degree (0) 5 degree (1)
+ * CFG_DSPL_TYPE	- The ili9341 display variant: TFT (0) IPS (1)
  */
 typedef enum { CFG_CELSIUS = 1, CFG_BUZZER = 2, CFG_SWITCH = 4, CFG_AU_START = 8,
-				CFG_I_CLOCKWISE = 16, CFG_G_CLOCKWISE = 32, CFG_BIG_STEP = 128 } CFG_BIT_MASK;
+				CFG_I_CLOCKWISE = 16, CFG_G_CLOCKWISE = 32, CFG_FAST_COOLING = 64, CFG_BIG_STEP = 128,
+				CFG_DSPL_TYPE = 256 } CFG_BIT_MASK;
 
 typedef enum { d_t12 = 0, d_gun = 1, d_unknown } tDevice;
 
@@ -51,7 +61,7 @@ struct s_config {
 	uint8_t		boost;								// Two 4-bits parameters: The boost increment temperature and boost time. See description above
 	uint8_t		tip;								// Current tip index
 	uint8_t		off_timeout;						// The Automatic switch-off timeout in minutes [0 - 30]
-	uint8_t		bit_mask;							// See CFG_BIT_MASK
+	uint16_t	bit_mask;							// See CFG_BIT_MASK
 	uint8_t		dspl_bright;						// The display brightness
 	uint8_t		dspl_rotation;						// The display rotation (TFT_ROTATION_0, TFT_ROTATION_90, TFT_ROTATION_180, TFT_ROTATION_270)
 	char		language[LANG_LENGTH];				// The language. lLANG_LENGTH defined in vars.h

@@ -3,6 +3,9 @@
  *
  *  Created on: 16 sep 2019
  *      Author: Alex
+ *
+ *  2022 DEC 26
+ *     Added gtimPeriod() function that return the period of GUN timer in ms
  */
 
 #ifndef CORE_H_
@@ -15,7 +18,8 @@
 #endif
 
 // Forward function declaration
-bool isACsine(void);
+bool		isACsine(void);
+uint16_t	gtimPeriod(void);
 
 #ifdef __cplusplus
 extern "C" {

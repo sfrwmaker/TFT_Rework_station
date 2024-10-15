@@ -1,6 +1,10 @@
 /*
  * gun.h
  *
+ * 2024 OCT 06, v.1.15
+ * 	  Added fast_cooling parameter to HOTGUN
+ * 	  Added HOTGUN::setFastGunCooling()
+ * 	  Changed the HOTGUN::sw_avg_len from 10 to 13
  */
 
 #ifndef GUN_H_
@@ -27,6 +31,7 @@ class HOTGUN : public UNIT {
         virtual uint16_t 	tmpDispersion(void)				{ return d_temp.read(); 						}
 		virtual void		setTemp(uint16_t temp)			{ temp_set	= constrain(temp, 0, int_temp_max);	}
 		void				setFan(uint16_t fan)			{ fan_speed = constrain(fan, min_working_fan, max_fan_speed);	}
+		void				setFastGunCooling(bool on)		{ fast_cooling = on;							}
 		void				fanFixed(uint16_t fan)			{ TIM2->CCR2 = constrain(fan, 0, max_fan_speed);}
 		void				fanControl(bool on);
 		void				updateTemp(uint16_t value);
@@ -46,6 +51,7 @@ class HOTGUN : public UNIT {
 		uint8_t    	fix_power			= 0;				// Fixed power value of the Hot Air Gun (or zero if off)
 		bool		chill				= false;			// Chill the Hot Air gun if it is over heating
 		bool		reach_cold_temp		= true;				// Flag indicating the Hot Air Gun has reached the 'temp_gun_cold' temperature
+		bool		fast_cooling		= false;			// Flag indicating maximum fan speed when cooling
 		uint16_t	temp_set			= 0;				// The preset temperature of the hot air gun (internal units)
 		uint16_t	fan_speed			= 0;				// Preset fan speed
 		uint32_t	fan_off_time		= 0;				// Time when the fan should be powered off in cooling mode (ms)
@@ -70,7 +76,7 @@ class HOTGUN : public UNIT {
 		const 		uint16_t	fan_on_value	= 1000;
 		const 		uint8_t		sw_off_value	= 30;
 		const 		uint8_t		sw_on_value		= 60;
-		const 		uint8_t		sw_avg_len		= 10;
+		const 		uint8_t		sw_avg_len		= 13;
         const		uint32_t	relay_activate	= 1;		// The relay activation delay (loops of TIM1, 1 time per second)
 };
 

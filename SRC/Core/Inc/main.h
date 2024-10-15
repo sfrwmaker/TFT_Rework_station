@@ -122,8 +122,9 @@ void Error_Handler(void);
 #define TFT_DC_GPIO_Port GPIOB
 #define BUZZER_Pin GPIO_PIN_9
 #define BUZZER_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
-#define FW_VERSION	("1.14")
+#define FW_VERSION	("1.15")
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

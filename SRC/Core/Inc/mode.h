@@ -6,6 +6,12 @@
  *
  * 2024 MAR 28
  *     changed class MTACT to include pointer to the FAIL mode
+ *  2024 OCT 06, v.1.15
+ *  	All parameters are inside CFG_CORE::t_setup_arg in MSETUP class
+ *  	Added MM_FAST_COOL and MM_DSPL_TYPE menu items into MSETUP class
+ *  2024 OCT 09
+ *  	Moved flash debug into ABOUT mode. Changed MABOUT and MDEBUG constructors
+ *  	Added MENCODER class to debug rotary encoders
  *
  */
 
@@ -104,28 +110,18 @@ public:
 	virtual void	init(void);
 	virtual MODE*	loop(void);
 private:
-	uint8_t		off_timeout		= 0;					// Automatic switch off timeout in minutes or 0 to disable
-	uint16_t	low_temp		= 0;					// The low power temperature (Celsius) 0 - disable tilt sensor
-	uint8_t		low_to			= 0;					// The low power timeout, seconds
-	bool		buzzer			= true;					// Whether the buzzer is enabled
-	bool		celsius			= true;					// Temperature units: C/F
-	bool		reed			= false;				// IRON switch type: reed/tilt
-	bool		temp_step		= false;				// The preset temperature step (1/5)
-	bool		i_clock_wise	= true;					// The rotary encoder mode
-	bool		g_clock_wise	= true;
-	bool		auto_start		= false;				// Automatic power on iron at startup
-	uint8_t		dspl_bright		= 128;					// Display brightness
+	CFG_CORE::t_setup_arg	prm;
 	uint8_t		dspl_rotation	= 0;					// Display rotation
 	uint8_t		lang_index		= 0;					// Language Index (0 - english)
 	uint8_t		num_lang		= 0;					// Number of the loaded languages
 	uint8_t		set_param		= 0;					// The index of the modifying parameter
 	uint8_t		mode_menu_item 	= 0;					// Save active menu element index to return back later
 	// When new menu item added, in_place_start, in_place_end, tip_calib_menu constants should be adjusted
-	const uint8_t	in_place_start	= 7;				// See the menu names. Index of the first parameter that can be changed inside menu (see nls.h)
-	const uint8_t	in_place_end	= 12;				// See the menu names. Index of the last parameter that can be changed inside menu
+	const uint8_t	in_place_start	= MM_AUTO_OFF;		// See the menu names. Index of the first parameter that can be changed inside menu (see nls.h)
+	const uint8_t	in_place_end	= MM_LANGUAGE;		// See the menu names. Index of the last parameter that can be changed inside menu
 	const uint16_t	min_standby_C	= 120;				// Minimum standby temperature, Celsius
-	enum { MM_UNITS = 0, MM_BUZZER, MM_I_ENC, MM_G_ENC, MM_SWITCH_TYPE, MM_TEMP_STEP, MM_AUTO_START,
-			MM_AUTO_OFF, MM_STANDBY_TEMP, MM_STANDBY_TIME, MM_BRIGHT, MM_ROTATION, MM_LANGUAGE, MM_SAVE, MM_CANCEL
+	enum { MM_UNITS = 0, MM_BUZZER, MM_I_ENC, MM_G_ENC, MM_FAST_COOL, MM_SWITCH_TYPE, MM_TEMP_STEP, MM_AUTO_START,
+			MM_AUTO_OFF, MM_STANDBY_TEMP, MM_STANDBY_TIME, MM_BRIGHT, MM_ROTATION, MM_LANGUAGE, MM_DSPL_TYPE, MM_SAVE, MM_CANCEL
 	};
 };
 
@@ -318,9 +314,11 @@ class MMENU : public MODE {
 //---------------------- The About dialog mode. Show about message ---------------
 class MABOUT : public MODE {
 	public:
-		MABOUT(HW *pCore) : MODE(pCore)						{ }
+		MABOUT(HW *pCore, MODE* flash_debug) : MODE(pCore)	{ this->flash_debug = flash_debug; }
 		virtual void	init(void);
 		virtual MODE*	loop(void);
+	private:
+		MODE*			flash_debug;						// Flash debug mode pointer
 };
 
 
@@ -330,11 +328,10 @@ extern TIM_HandleTypeDef GUN_TIM;
 //---------------------- The Debug mode: display internal parameters ------------
 class MDEBUG : public MODE {
 	public:
-		MDEBUG(HW *pCore, MODE* flash_debug);
+		MDEBUG(HW *pCore)  : MODE(pCore)					{ }
 		virtual void	init(void);
 		virtual MODE*	loop(void);
 	private:
-		MODE*			flash_debug;						// Flash debug mode pointer
 		uint16_t		old_ip 			= 0;				// Old IRON encoder value
 		uint16_t		old_fp			= 0;				// Old GUN encoder value
 		bool			gun_is_on 		= false;			// Flag indicating the gun is powered on
@@ -363,6 +360,18 @@ class FDEBUG : public MODE {
 		MFAIL			*pFail;
 		const uint32_t	update_timeout	= 60000;			// Default update display timeout, ms
 
+};
+
+//---------------------- The Encoder debug mode: check encoders -----------------
+class MENCODER: public MODE {
+	public:
+		MENCODER(HW *pCore) : MODE(pCore)					{ setTimeout(60); }
+		virtual void	init(void);
+		virtual MODE*	loop(void);
+	private:
+		uint16_t		i_enc	= start_pos;
+		uint16_t		g_enc	= start_pos;
+		const uint16_t	start_pos = 500;
 };
 
 #endif

@@ -3,6 +3,11 @@
  *
  *  Created on: 15 aug. 2019.
  *      Author: Alex
+ *
+ *  2024 OCT 09, v.1.15
+ *  	Added RENC::enc_int variable to calculate the number of encoder interrupts. Used in debug mode.
+ *  	Added RENC::intNumber() method
+ *  	Added RENC::buttonPressed() method to check current button status
  */
  
 #ifndef ENCODER_H_
@@ -15,14 +20,16 @@ class RENC {
 		RENC(GPIO_TypeDef* aPORT, uint16_t aPIN, GPIO_TypeDef* bPORT, uint16_t bPIN);
 		void 		addButton(GPIO_TypeDef* ButtonPORT, uint16_t ButtonPIN);
 		uint8_t		buttonStatus(void);
-		void		setClockWise(bool clockwise)			{ this->clockwise = clockwise;		}
+		void		setClockWise(bool clockwise)			{ this->clockwise = clockwise;									}
 		bool		write(int16_t initPos);
 		void    	reset(int16_t initPos, int16_t low, int16_t upp, uint8_t inc, uint8_t fast_inc, bool looped);
 		void 		encoderIntr(void);
-		void 		setTimeout(uint16_t timeout_ms)			{ over_press = timeout_ms; }
-		void    	setIncrement(uint8_t inc)           	{ increment = fast_increment = inc; }
-		uint8_t		getIncrement(void)                 		{ return increment; }
-		int16_t 	read(void)                          	{ return pos; }
+		void 		setTimeout(uint16_t timeout_ms)			{ over_press = timeout_ms; 										}
+		void    	setIncrement(uint8_t inc)           	{ increment = fast_increment = inc; 							}
+		uint8_t		getIncrement(void)                 		{ return increment; 											}
+		int16_t 	read(void)                          	{ return pos;													}
+		bool 		buttonPressed(void)						{ return (GPIO_PIN_RESET == HAL_GPIO_ReadPin(b_port, b_pin));	}
+		uint32_t	intNumber(void);
 	private:
 		EMP_AVERAGE			avg;							// Do average the button readings to maintain the button status
 		int16_t				min_pos	= 0;					// Minimum value of rotary encoder
@@ -45,6 +52,7 @@ class RENC {
 		uint16_t			b_pin	= 0;					// The PIN number of the button
 		uint16_t			m_pin	= 0;					// The PIN number of the main channel
 		uint16_t			s_pin	= 0;	    			// The PIN number of the secondary channel
+		uint32_t			enc_int	= 0;					// The number of encoder interrupts received
 		bool				clockwise		= true;			// How exactly the encoder soldered
         const uint8_t     	trigger_on		= 100;			// avg limit to change button status to on
         const uint8_t     	trigger_off 	= 50;			// avg limit to change button status to off

@@ -1,7 +1,16 @@
 /*
  * display.h
  *
+ * 2022 Dec 2
+ *    changed BGRT class to use the timer instance
  *
+ * 2022 DEC 26
+ *     Added new parameter to the DSPL::debugShow()
+ * 2024 OCT 09, v.1.15
+ * 		Added DSPL::encoderDebugShow()
+ *		Added DSPL::drawButtonStatus()
+ *	2024 OCT 12
+ *		Added a parameter to DSPL::init() to support IPS display
  */
 
 #ifndef DISPLAY_H_
@@ -17,18 +26,19 @@
 #include "tools.h"
 
 // TFT brightness control class
-extern TIM_HandleTypeDef htim3;
+#define TFT_TIM		htim3
+extern TIM_HandleTypeDef TFT_TIM;
 
 class BRGT {
 	public:
 		BRGT(void)								{ }
-		void		start(void)								{ HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);	}
-		void		stop(void)								{ HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_1);	}
-		void		set(uint8_t brightness)					{ this->brightness = brightness;			}
-		uint8_t		get(void)								{ return TIM3->CCR1 & 0xff;					}
-		void		off(void)								{ TIM3->CCR1 = 0;							}
-		void		dim(uint8_t br)							{ TIM3->CCR1 = br;							}
-		void		on(void)								{ TIM3->CCR1 = brightness;					}
+		void		start(void)								{ HAL_TIM_PWM_Start(&TFT_TIM, TIM_CHANNEL_1);	}
+		void		stop(void)								{ HAL_TIM_PWM_Stop(&TFT_TIM, TIM_CHANNEL_1);	}
+		void		set(uint8_t brightness)					{ this->brightness = brightness;				}
+		uint8_t		get(void)								{ return TFT_TIM.Instance->CCR1 & 0xff;			}
+		void		off(void)								{ TFT_TIM.Instance->CCR1 = 0;					}
+		void		dim(uint8_t br)							{ TFT_TIM.Instance->CCR1 = br;					}
+		void		on(void)								{ TFT_TIM.Instance->CCR1 = brightness;			}
 		bool		adjust(void);
 	private:
 		uint8_t	brightness			= 0;					// Setup display brightness
@@ -40,7 +50,7 @@ class DSPL : public tft_ILI9341, public BRGT, public GRAPH, public NLS_MSG {
 	public:
 					DSPL(void) : tft_ILI9341()				{ }
 		virtual		~DSPL()									{ }
-		void		init();
+		void		init(bool ips = false);
 		void		rotate(tRotation rotation);
 		void		setLetterFont(uint8_t *font);
 		void		clear(void);
@@ -88,14 +98,16 @@ class DSPL : public tft_ILI9341, public BRGT, public GRAPH, public NLS_MSG {
 		void		errorMessage(t_msg_id err_id, uint16_t y);
 		void		showDialog(t_msg_id msg_id, uint16_t y, bool yes, const char *parameter = 0);
 		void 		showVersion(void);
-		void 		debugShow(uint16_t data[9], bool iron_on, bool gun_on, bool iron_connected, bool gun_connected);
+		void 		debugShow(uint16_t data[9], bool iron_on, bool gun_on, bool iron_connected, bool gun_connected, bool is_ac_ok);
 		void		debugMessage(const char *msg, uint16_t x, uint16_t y, uint16_t len);
+		void		encoderDebugShow(uint16_t i_enc, uint32_t i_ints, uint8_t i_b, uint16_t g_enc, uint32_t g_ints, uint8_t g_b, uint8_t ret);
 	private:
 		void		checkBox(BITMAP &bm, uint16_t x, uint8_t size, bool checked);
 		void		drawTemp(uint16_t temp, uint16_t x, uint16_t y, bool celsius);
 		void		drawPowerTriangle(uint8_t power, uint16_t x0, uint16_t p_top);
 		void		drawHGauge(uint16_t len, uint16_t g_width, uint16_t x, uint16_t y, int16_t label = -1);
 		void		drawValue(uint16_t value, uint16_t x, uint16_t y, BM_ALIGN align, uint16_t color);
+		void 		drawButtonStatus(uint8_t button, uint16_t x, uint16_t y, uint16_t color);
 		void		update(void);
 		uint8_t*	letter_font			= (uint8_t*)u8g_font_profont22r;
 		uint16_t	bg_color			= 0;

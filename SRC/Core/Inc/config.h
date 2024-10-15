@@ -3,6 +3,11 @@
  *
  *  Created on: 12 july 2021.
  *      Author: Alex
+ *  2024 OCT 06, v.1.15
+ *  	Added CFG::CORE::isFastGunCooling()
+ *  	Added new parameter to CFG_CORE::setup()
+ *  	Added new internal type (struct s_setup) into CFG_CORE class allowing to pass parameters into CFG_CORE::setup()
+ *  	Added new method, CFG_CORE::getMainParams()
  */
 
 #ifndef CONFIG_H_
@@ -26,6 +31,22 @@ typedef enum {CFG_OK = 0, CFG_NO_TIP, CFG_READ_ERROR, CFG_NO_FILESYSTEM} CFG_STA
  */
 class CFG_CORE: public TIPS {
 	public:
+	typedef struct s_setup {
+		uint8_t off_timeout;
+		bool buzzer;
+		bool celsius;
+		bool reed;
+		bool big_temp_step;
+		bool i_enc;
+		bool g_enc;
+		bool fast_cooling;
+		bool auto_start;
+		uint16_t low_temp;
+		uint8_t low_to;
+		uint8_t bright;
+		bool ips_display;
+	} t_setup_arg;
+
 		CFG_CORE(void)									{ }
 		bool		isCelsius(void) 					{ return a_cfg.bit_mask & CFG_CELSIUS;		}
 		bool		isBuzzerEnabled(void)				{ return a_cfg.bit_mask & CFG_BUZZER; 		}
@@ -34,6 +55,8 @@ class CFG_CORE: public TIPS {
 		bool		isAutoStart(void)					{ return a_cfg.bit_mask & CFG_AU_START;		}
 		bool		isIronEncClockWise(void)			{ return a_cfg.bit_mask & CFG_I_CLOCKWISE;	}
 		bool		isGunEncClockWise(void)				{ return a_cfg.bit_mask & CFG_G_CLOCKWISE;	}
+		bool		isFastGunCooling(void)				{ return a_cfg.bit_mask & CFG_FAST_COOLING;	}
+		bool		isIPS(void)							{ return a_cfg.bit_mask & CFG_DSPL_TYPE;	}
 		uint16_t	tempPresetHuman(void) 				{ return a_cfg.iron_temp;					}	// Human readable units
 		uint16_t	gunTempPreset(void)					{ return a_cfg.gun_temp;					}	// Human readable units
 		uint16_t	gunFanPreset(void)					{ return a_cfg.gun_fan_speed;				}
@@ -45,8 +68,8 @@ class CFG_CORE: public TIPS {
 		void		setDsplRotation(uint8_t rotation)	{ a_cfg.dspl_rotation = rotation;			}
 		void		setLanguage(const char *lang)		{ strncpy(a_cfg.language, lang, LANG_LENGTH);}
 		const char	*getLanguage(void);					// Returns current language name
-		void		setup(uint8_t off_timeout, bool buzzer, bool celsius, bool reed, bool big_temp_step, bool i_enc, bool g_enc,
-						bool auto_start, uint16_t low_temp, uint8_t low_to, uint8_t bright);
+		void		getMainParams(t_setup_arg &prm);
+		void		setup(t_setup_arg &arg);
 		void 		savePresetTempHuman(uint16_t temp_set);
 		void		saveGunPreset(uint16_t temp, uint16_t fan = 0);
 		uint8_t		boostTemp(void);
